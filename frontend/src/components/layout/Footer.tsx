@@ -39,7 +39,7 @@ export function Footer() {
           <ul className="mt-4 space-y-2.5 text-sm text-ink-600 dark:text-ink-300">
             <li className="flex items-start gap-2">
               <Mail size={16} className="mt-0.5 shrink-0 text-brand-600" />
-              contact@astarsquad.org
+              astarsquad@alandas.site
             </li>
             <li className="flex items-start gap-2">
               <MapPin size={16} className="mt-0.5 shrink-0 text-brand-600" />
@@ -52,7 +52,7 @@ export function Footer() {
           <h3 className="text-sm font-semibold uppercase tracking-wide text-ink-400">Kết nối</h3>
           <div className="mt-4 flex gap-3">
             <a
-              href="#"
+              href=""
               aria-label="Facebook"
               className="inline-flex h-9 w-9 items-center justify-center border border-ink-300 text-ink-600 transition-colors hover:border-brand-600 hover:text-brand-600 dark:border-ink-700 dark:text-ink-300"
             >

@@ -26,7 +26,7 @@ export function MemberDetail() {
         <div className="mt-8 grid gap-10 border border-ink-200 dark:border-ink-800 md:grid-cols-[280px_1fr]">
           <div className="aspect-square w-full overflow-hidden border-b border-ink-200 bg-ink-100 dark:border-ink-800 dark:bg-ink-800 md:aspect-auto md:border-b-0 md:border-r">
             {member.photoUrl ? (
-              <img src={member.photoUrl} alt={member.fullName} className="h-full w-full object-cover grayscale" />
+              <img src={member.photoUrl} alt={member.fullName} className="h-full w-full object-cover" />
             ) : (
               <div className="flex h-full min-h-[280px] w-full items-center justify-center font-serif text-6xl text-ink-300 dark:text-ink-600">
                 {member.fullName.charAt(0)}

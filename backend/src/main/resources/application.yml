@@ -40,6 +40,16 @@ server:
   # Render (and most PaaS) inject PORT at runtime; SERVER_PORT/8080 remain the local/Docker default.
   port: ${PORT:${SERVER_PORT:8080}}
 
+management:
+  endpoint:
+    health:
+      # Don't let a (possibly not-yet-configured) SMTP server take down the health
+      # check Render uses to decide if this instance is alive.
+      show-details: never
+  health:
+    mail:
+      enabled: false
+
 app:
   jwt:
     # Dev-only default secret — MUST be overridden via JWT_SECRET env var in production.

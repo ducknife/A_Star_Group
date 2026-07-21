@@ -78,14 +78,17 @@ public class DocumentService {
     }
 
     @Transactional
-    public String prepareDownload(Long id) {
+    public DownloadPayload prepareDownload(Long id) {
         Document document = getOrThrow(id);
         document.setDownloadCount(document.getDownloadCount() + 1);
-        return document.getFileUrl();
+        return new DownloadPayload(document.getFileUrl(), document.getFileName(), document.getContentType());
     }
 
     private Document getOrThrow(Long id) {
         return documentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tài liệu có id=" + id));
+    }
+
+    public record DownloadPayload(String url, String fileName, String contentType) {
     }
 }

@@ -86,7 +86,7 @@ export function MembersAdmin() {
               <Card key={member.id} className="flex gap-4 p-5">
                 <div className="h-16 w-16 shrink-0 overflow-hidden border border-ink-200 bg-ink-100 dark:border-ink-800 dark:bg-ink-800">
                   {member.photoUrl ? (
-                    <img src={member.photoUrl} alt="" className="h-full w-full object-cover grayscale" />
+                    <img src={member.photoUrl} alt="" className="h-full w-full object-cover" />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center font-serif text-xl text-ink-300 dark:text-ink-600">
                       {member.fullName.charAt(0)}

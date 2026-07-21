@@ -8,7 +8,7 @@ export function MemberCard({ member }: { member: Member }) {
       <Card className="flex h-full flex-col">
         <div className="aspect-square w-full overflow-hidden border-b border-ink-200 bg-ink-100 dark:border-ink-800 dark:bg-ink-800">
           {member.photoUrl ? (
-            <img src={member.photoUrl} alt={member.fullName} className="h-full w-full object-cover grayscale" />
+            <img src={member.photoUrl} alt={member.fullName} className="h-full w-full object-cover" />
           ) : (
             <div className="flex h-full w-full items-center justify-center font-serif text-5xl text-ink-300 dark:text-ink-600">
               {member.fullName.charAt(0)}
