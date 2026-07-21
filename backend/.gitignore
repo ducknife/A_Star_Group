@@ -1,0 +1,19 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**
+!**/src/test/**
+
+### Uploaded files (local dev storage) ###
+uploads/
+
+### IDE ###
+.idea/
+*.iml
+.vscode/
+
+### Env ###
+.env
+application-local.yml
+
+### OS ###
+.DS_Store

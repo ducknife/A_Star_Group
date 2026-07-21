@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Brand red — sampled directly from the A* SQUAD logo (#EC1C24) */
+  --color-brand-50: #fef2f2;
+  --color-brand-100: #fde2e3;
+  --color-brand-200: #fbc8ca;
+  --color-brand-300: #f79a9d;
+  --color-brand-400: #f2666a;
+  --color-brand-500: #ee3f43;
+  --color-brand-600: #ec1c24;
+  --color-brand-700: #c4131a;
+  --color-brand-800: #9c1218;
+  --color-brand-900: #7c1216;
+  --color-brand-950: #43090b;
+
+  /* Neutral "ink" scale for professional light/dark surfaces */
+  --color-ink-0: #ffffff;
+  --color-ink-50: #f8f8f9;
+  --color-ink-100: #f0f1f2;
+  --color-ink-200: #e3e4e7;
+  --color-ink-300: #cbccd1;
+  --color-ink-400: #9a9ca4;
+  --color-ink-500: #6c6e77;
+  --color-ink-600: #4c4e57;
+  --color-ink-700: #34363e;
+  --color-ink-800: #202127;
+  --color-ink-900: #131317;
+  --color-ink-950: #0a0a0c;
+
+  --font-serif: "Playfair Display", "Times New Roman", serif;
+  --font-sans: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+  --font-script: "Dancing Script", cursive;
+
+  --animate-fade-up: fade-up 0.6s ease both;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-ink-0);
+  color: var(--color-ink-800);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.dark body {
+  background-color: var(--color-ink-950);
+  color: var(--color-ink-100);
+}
+
+::selection {
+  background-color: var(--color-brand-600);
+  color: white;
+}
+
+/* Harvard-Crimson-style uppercase kicker label, used above article/section headlines */
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-brand-600);
+}
+
+.dark .kicker {
+  color: var(--color-brand-400);
+}
+
+.kicker::before {
+  content: "";
+  display: block;
+  width: 1.25rem;
+  height: 2px;
+  background: currentColor;
+}
+
+.marquee-track {
+  animation: marquee 28s linear infinite;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
