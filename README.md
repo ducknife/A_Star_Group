@@ -7,7 +7,8 @@ Landing page + trang quản trị cho A* SQUAD — cộng đồng học thuật 
 ```
 AStarGroupLandingPage/
 ├── frontend/          React 19 + TypeScript + Vite + Tailwind CSS v4 (Dockerfile + nginx, vercel.json)
-├── backend/           Spring Boot 3.5 (Java 21) — REST API (Dockerfile, render.yaml)
+├── backend/           Spring Boot 3.5 (Java 21) — REST API (Dockerfile)
+├── render.yaml        Blueprint Render: tự tạo Postgres + tự sinh JWT_SECRET + wiring DB
 ├── docker-compose.yml Postgres + backend + frontend, đọc biến môi trường từ .env
 └── .env               Secrets: Cloudinary, Gmail SMTP, admin mặc định, JWT (không commit)
 ```
@@ -85,17 +86,19 @@ Truy cập `http://localhost:5173`.
 
 ## Triển khai production: Backend → Render, Frontend → Vercel
 
-### Backend trên Render
+### Backend trên Render — dùng Blueprint (`render.yaml`), gần như tự động
 
-1. Push code lên GitHub/GitLab.
-2. Trên Render: **New → Blueprint**, trỏ vào repo — Render đọc sẵn `backend/render.yaml` (dùng Dockerfile có sẵn).
-   - Hoặc tạo thủ công: **New → Web Service**, chọn **Docker**, root directory `backend/`.
-3. Tạo một **PostgreSQL** instance riêng trên Render (New → PostgreSQL), lấy thông tin **Host / Port / Database / Username / Password** (không dùng chung connection string, vì app cấu hình theo từng biến rời).
-4. Điền các biến môi trường cho service (đánh dấu `sync: false` trong `render.yaml` nghĩa là bạn tự nhập trong dashboard):
-   `DB_HOST, DB_PORT, DB_NAME, DB_USERNAME, DB_PASSWORD, JWT_SECRET, ADMIN_DEFAULT_USERNAME, ADMIN_DEFAULT_PASSWORD, CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, EMAIL_DEFAULT, EMAIL_PASSWORD_APP, CORS_ALLOWED_ORIGINS`
-   - `CORS_ALLOWED_ORIGINS` = domain Vercel của frontend (vd `https://astarsquad.vercel.app`), nhiều domain cách nhau bởi dấu phẩy.
-5. Render tự cấp biến `PORT` — backend đã đọc `${PORT:${SERVER_PORT:8080}}` nên không cần chỉnh gì thêm.
-6. Health check: `/actuator/health` (đã cấu hình sẵn trong `render.yaml` và cho phép public trong `SecurityConfig`).
+`render.yaml` nằm ở **gốc repo** và mô tả toàn bộ hạ tầng backend cần thiết: 1 PostgreSQL + 1 Web Service (Docker, root dir `backend/`). Render Blueprint sẽ **tự tạo Postgres, tự nối `DB_HOST/PORT/NAME/USERNAME/PASSWORD`, và tự sinh `JWT_SECRET` ngẫu nhiên** — bạn không cần tạo database riêng hay tự tay điền các biến đó.
+
+1. Push code lên GitHub (đã làm).
+2. Trên Render: **New → Blueprint** → chọn repo `A_Star_Group` → Render tự đọc `render.yaml` ở gốc repo, hiện ra bản xem trước gồm 1 database + 1 web service.
+3. Bấm **Apply** — Render sẽ hiện một form chỉ hỏi đúng **7 biến còn thiếu** (những biến bên ngoài Render không thể tự biết, lấy từ file `.env` local của bạn):
+   `ADMIN_DEFAULT_USERNAME, ADMIN_DEFAULT_PASSWORD, CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, EMAIL_DEFAULT, EMAIL_PASSWORD_APP`
+4. Deploy xong, `CORS_ALLOWED_ORIGINS` tạm để mặc định `http://localhost:5173` (app vẫn chạy bình thường) — sau khi deploy Vercel xong ở bước dưới, quay lại tab **Environment** của service này, sửa `CORS_ALLOWED_ORIGINS` thành domain Vercel thật (vd `https://astarsquad.vercel.app`), Render tự redeploy.
+
+> Không muốn dùng Blueprint? Vẫn có thể tạo thủ công: **New → PostgreSQL** rồi **New → Web Service** (Docker, root directory `backend/`) và tự điền toàn bộ biến — nhưng cách Blueprint ở trên nhanh và ít sai sót hơn.
+
+Render tự cấp biến `PORT` — backend đã đọc `${PORT:${SERVER_PORT:8080}}` nên không cần chỉnh gì thêm. Health check: `/actuator/health` (đã cấu hình sẵn trong `render.yaml`, cho phép public trong `SecurityConfig`).
 
 ### Frontend trên Vercel
 
