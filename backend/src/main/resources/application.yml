@@ -35,6 +35,12 @@ spring:
           auth: true
           starttls:
             enable: true
+          # Without explicit timeouts, a blocked/unreachable SMTP port hangs the
+          # request indefinitely (relying on OS-level TCP timeouts) instead of
+          # failing fast with a clear error.
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
 
 server:
   # Render (and most PaaS) inject PORT at runtime; SERVER_PORT/8080 remain the local/Docker default.
