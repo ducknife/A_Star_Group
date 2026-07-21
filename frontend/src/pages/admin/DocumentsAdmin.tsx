@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
@@ -9,19 +9,21 @@ import { ImageInput } from "../../components/ui/ImageInput";
 import { LoadingState, ErrorState, EmptyState } from "../../components/ui/StateMessage";
 import { useFetch } from "../../hooks/useFetch";
 import { useAuth } from "../../context/AuthContext";
-import { createDocument, deleteDocument, listDocuments } from "../../lib/documents";
+import { createDocument, deleteDocument, listDocuments, updateDocument } from "../../lib/documents";
 import { DOCUMENT_CATEGORY_LABELS } from "../../lib/constants";
-import type { DocumentCategory } from "../../types";
+import type { AppDocument, DocumentCategory } from "../../types";
 
 export function DocumentsAdmin() {
   const { auth } = useAuth();
   const canManageAll = auth?.role === "ADMIN" || auth?.role === "MOD";
 
   const [version, setVersion] = useState(0);
-  const { data, loading, error } = useFetch(() => listDocuments(), [version]);
+  const { data, loading, error } = useFetch(() => listDocuments({ size: 1000 }), [version]);
+  const documents = data?.content ?? [];
   const refetch = () => setVersion((v) => v + 1);
 
   const [showForm, setShowForm] = useState(false);
+  const [editing, setEditing] = useState<AppDocument | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<DocumentCategory>("SCHOLARSHIP_GUIDE");
@@ -37,11 +39,31 @@ export function DocumentsAdmin() {
     setThumbnail(null);
   };
 
+  const openCreate = () => {
+    setEditing(null);
+    resetForm();
+    setShowForm(true);
+  };
+
+  const openEdit = (doc: AppDocument) => {
+    setEditing(doc);
+    setTitle(doc.title);
+    setDescription(doc.description ?? "");
+    setCategory(doc.category);
+    setFile(null);
+    setThumbnail(null);
+    setShowForm(true);
+  };
+
   const handleSubmit = async () => {
-    if (!file || !thumbnail) return;
     setSaving(true);
     try {
-      await createDocument({ title, description, category, file, thumbnail });
+      if (editing) {
+        await updateDocument(editing.id, { title, description, category, file: file ?? undefined, thumbnail: thumbnail ?? undefined });
+      } else {
+        if (!file || !thumbnail) return;
+        await createDocument({ title, description, category, file, thumbnail });
+      }
       setShowForm(false);
       resetForm();
       refetch();
@@ -64,10 +86,10 @@ export function DocumentsAdmin() {
           <p className="mt-1 text-sm text-ink-500 dark:text-ink-400">
             {canManageAll
               ? "Quản lý toàn bộ tài liệu công khai cho cộng đồng."
-              : "Đăng tải tài liệu của bạn lên kho tài liệu chung."}
+              : "Đăng tải và quản lý tài liệu của bạn trong kho tài liệu chung."}
           </p>
         </div>
-        <Button icon={<Plus size={16} />} onClick={() => setShowForm(true)}>
+        <Button icon={<Plus size={16} />} onClick={openCreate}>
           Tải lên tài liệu
         </Button>
       </div>
@@ -75,11 +97,11 @@ export function DocumentsAdmin() {
       <div className="mt-8">
         {loading && <LoadingState />}
         {error && <ErrorState message={error} />}
-        {data && data.length === 0 && <EmptyState message="Chưa có tài liệu nào. Hãy tải lên tài liệu đầu tiên." />}
-        {data && data.length > 0 && (
+        {data && documents.length === 0 && <EmptyState message="Chưa có tài liệu nào. Hãy tải lên tài liệu đầu tiên." />}
+        {documents.length > 0 && (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {data.map((doc) => {
-              const canDelete = canManageAll || doc.uploadedBy === auth?.username;
+            {documents.map((doc) => {
+              const canManage = canManageAll || doc.uploadedBy === auth?.username;
               return (
                 <Card key={doc.id} className="flex flex-col">
                   <div className="aspect-[3/4] w-full overflow-hidden border-b border-ink-200 bg-ink-100 dark:border-ink-800 dark:bg-ink-800">
@@ -91,16 +113,20 @@ export function DocumentsAdmin() {
                     {doc.uploadedBy && (
                       <p className="mt-1 text-xs text-ink-400">Đăng bởi @{doc.uploadedBy}</p>
                     )}
-                    {canDelete && (
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        className="mt-3"
-                        icon={<Trash2 size={14} />}
-                        onClick={() => handleDelete(doc.id, doc.title)}
-                      >
-                        Xoá
-                      </Button>
+                    {canManage && (
+                      <div className="mt-3 flex gap-2">
+                        <Button variant="ghost" size="sm" icon={<Pencil size={14} />} onClick={() => openEdit(doc)}>
+                          Sửa
+                        </Button>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          icon={<Trash2 size={14} />}
+                          onClick={() => handleDelete(doc.id, doc.title)}
+                        >
+                          Xoá
+                        </Button>
+                      </div>
                     )}
                   </div>
                 </Card>
@@ -111,7 +137,7 @@ export function DocumentsAdmin() {
       </div>
 
       {showForm && (
-        <Modal title="Tải lên tài liệu" onClose={() => setShowForm(false)}>
+        <Modal title={editing ? "Sửa tài liệu" : "Tải lên tài liệu"} onClose={() => setShowForm(false)}>
           <form
             className="space-y-4"
             onSubmit={(e) => {
@@ -136,11 +162,22 @@ export function DocumentsAdmin() {
                 </option>
               ))}
             </SelectField>
-            <ImageInput label="Ảnh thumbnail" required value={thumbnail} onChange={setThumbnail} />
+            <ImageInput
+              label="Ảnh thumbnail"
+              required={!editing}
+              value={thumbnail}
+              onChange={setThumbnail}
+              existingUrl={editing?.thumbnailUrl}
+            />
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-ink-700 dark:text-ink-300">Tệp tài liệu</label>
+              <label className="mb-1.5 block text-sm font-medium text-ink-700 dark:text-ink-300">
+                {editing ? "Thay thế tệp (không bắt buộc)" : "Tệp tài liệu"}
+              </label>
+              {editing && (
+                <p className="mb-1.5 text-xs text-ink-400">Hiện tại: {editing.fileName}</p>
+              )}
               <input
-                required
+                required={!editing}
                 type="file"
                 onChange={(e) => setFile(e.target.files?.[0] ?? null)}
                 className="w-full text-sm text-ink-500 dark:text-ink-400"
@@ -151,8 +188,8 @@ export function DocumentsAdmin() {
               <Button type="button" variant="ghost" onClick={() => setShowForm(false)}>
                 Huỷ
               </Button>
-              <Button type="submit" disabled={saving || !file || !thumbnail}>
-                {saving ? "Đang tải lên..." : "Tải lên"}
+              <Button type="submit" disabled={saving || (!editing && (!file || !thumbnail))}>
+                {saving ? "Đang lưu..." : editing ? "Lưu thay đổi" : "Tải lên"}
               </Button>
             </div>
           </form>

@@ -7,17 +7,17 @@ import { listDocuments } from "../../lib/documents";
 
 export function Dashboard() {
   const members = useFetch(() => listMembers(), []);
-  const documents = useFetch(() => listDocuments(), []);
+  const documents = useFetch(() => listDocuments({ size: 1000 }), []);
 
   if (members.loading || documents.loading) return <LoadingState label="Đang tải tổng quan..." />;
   if (members.error || documents.error) return <ErrorState message="Không thể tải dữ liệu tổng quan." />;
 
-  const totalDownloads = (documents.data ?? []).reduce((sum, d) => sum + d.downloadCount, 0);
+  const totalDownloads = (documents.data?.content ?? []).reduce((sum, d) => sum + d.downloadCount, 0);
   const universities = new Set((members.data ?? []).map((m) => m.university)).size;
 
   const cards = [
     { icon: Users, label: "Thành viên", value: members.data?.length ?? 0 },
-    { icon: FileText, label: "Tài liệu", value: documents.data?.length ?? 0 },
+    { icon: FileText, label: "Tài liệu", value: documents.data?.totalElements ?? 0 },
     { icon: Download, label: "Lượt tải tài liệu", value: totalDownloads },
     { icon: GraduationCap, label: "Trường đại học", value: universities },
   ];

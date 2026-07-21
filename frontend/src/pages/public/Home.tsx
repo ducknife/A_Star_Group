@@ -23,7 +23,7 @@ import iconSphere from "../../assets/images/3d/sphere.png";
 
 export function Home() {
   const members = useFetch(() => listMembers(true), []);
-  const documents = useFetch(() => listDocuments(), []);
+  const documents = useFetch(() => listDocuments({ size: 4 }), []);
 
   return (
     <>
@@ -198,12 +198,12 @@ export function Home() {
           <div className="mt-12">
             {documents.loading && <LoadingState label="Đang tải tài liệu..." />}
             {documents.error && <ErrorState message={documents.error} />}
-            {documents.data && documents.data.length === 0 && (
+            {documents.data && documents.data.content.length === 0 && (
               <EmptyState message="Chưa có tài liệu nào được đăng tải." />
             )}
-            {documents.data && documents.data.length > 0 && (
+            {documents.data && documents.data.content.length > 0 && (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                {documents.data.slice(0, 4).map((doc) => (
+                {documents.data.content.map((doc) => (
                   <DocumentCard key={doc.id} document={doc} />
                 ))}
               </div>

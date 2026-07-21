@@ -30,12 +30,31 @@ public class DocumentAdminController {
         return documentService.create(title, description, category, file, thumbnail, authentication.getName());
     }
 
+    @PutMapping(value = "/{id}", consumes = "multipart/form-data")
+    public DocumentResponse update(
+            @PathVariable Long id,
+            @RequestParam String title,
+            @RequestParam(required = false) String description,
+            @RequestParam DocumentCategory category,
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnail,
+            Authentication authentication
+    ) {
+        return documentService.update(
+                id, title, description, category, file, thumbnail,
+                authentication.getName(), canManageAll(authentication)
+        );
+    }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id, Authentication authentication) {
-        boolean canManageAll = authentication.getAuthorities().stream()
+        documentService.delete(id, authentication.getName(), canManageAll(authentication));
+    }
+
+    private boolean canManageAll(Authentication authentication) {
+        return authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(a -> a.equals("ROLE_ADMIN") || a.equals("ROLE_MOD"));
-        documentService.delete(id, authentication.getName(), canManageAll);
     }
 }

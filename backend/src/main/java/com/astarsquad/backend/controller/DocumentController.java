@@ -1,6 +1,7 @@
 package com.astarsquad.backend.controller;
 
 import com.astarsquad.backend.dto.DocumentResponse;
+import com.astarsquad.backend.dto.PageResponse;
 import com.astarsquad.backend.entity.DocumentCategory;
 import com.astarsquad.backend.service.DocumentService;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/documents")
@@ -25,8 +25,13 @@ public class DocumentController {
     private final DocumentService documentService;
 
     @GetMapping
-    public List<DocumentResponse> findAll(@RequestParam(required = false) DocumentCategory category) {
-        return documentService.findAll(category);
+    public PageResponse<DocumentResponse> findAll(
+            @RequestParam(required = false) DocumentCategory category,
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size
+    ) {
+        return documentService.findAll(category, search, page, size);
     }
 
     @GetMapping("/{id}")

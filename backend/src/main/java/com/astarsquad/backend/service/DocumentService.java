@@ -1,17 +1,20 @@
 package com.astarsquad.backend.service;
 
 import com.astarsquad.backend.dto.DocumentResponse;
+import com.astarsquad.backend.dto.PageResponse;
 import com.astarsquad.backend.entity.Document;
 import com.astarsquad.backend.entity.DocumentCategory;
 import com.astarsquad.backend.exception.ResourceNotFoundException;
 import com.astarsquad.backend.repository.DocumentRepository;
+import com.astarsquad.backend.repository.DocumentSpecifications;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,11 +29,14 @@ public class DocumentService {
     private final CloudinaryStorageService cloudinaryStorageService;
 
     @Transactional(readOnly = true)
-    public List<DocumentResponse> findAll(DocumentCategory category) {
-        List<Document> documents = category != null
-                ? documentRepository.findAllByCategoryOrderByUploadedAtDesc(category)
-                : documentRepository.findAllByOrderByUploadedAtDesc();
-        return documents.stream().map(DocumentResponse::from).toList();
+    public PageResponse<DocumentResponse> findAll(DocumentCategory category, String search, int page, int size) {
+        Specification<Document> spec = Specification.allOf(
+                DocumentSpecifications.withCategory(category),
+                DocumentSpecifications.withSearch(search)
+        );
+        var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "uploadedAt"));
+        var result = documentRepository.findAll(spec, pageable);
+        return PageResponse.from(result, DocumentResponse::from);
     }
 
     @Transactional(readOnly = true)
@@ -69,12 +75,54 @@ public class DocumentService {
     @Transactional
     public void delete(Long id, String currentUsername, boolean canManageAll) {
         Document document = getOrThrow(id);
-        if (!canManageAll && !document.getUploadedBy().equals(currentUsername)) {
-            throw new AccessDeniedException("Bạn chỉ có thể xoá tài liệu do chính mình đăng tải.");
-        }
+        requireOwnership(document, currentUsername, canManageAll, "xoá");
         cloudinaryStorageService.delete(document.getCloudinaryPublicId(), RAW_TYPE);
         cloudinaryStorageService.delete(document.getThumbnailPublicId(), IMAGE_TYPE);
         documentRepository.delete(document);
+    }
+
+    @Transactional
+    public DocumentResponse update(
+            Long id,
+            String title,
+            String description,
+            DocumentCategory category,
+            MultipartFile file,
+            MultipartFile thumbnail,
+            String currentUsername,
+            boolean canManageAll
+    ) {
+        Document document = getOrThrow(id);
+        requireOwnership(document, currentUsername, canManageAll, "sửa");
+
+        document.setTitle(title);
+        document.setDescription(description);
+        document.setCategory(category);
+
+        if (file != null && !file.isEmpty()) {
+            cloudinaryStorageService.delete(document.getCloudinaryPublicId(), RAW_TYPE);
+            var uploaded = cloudinaryStorageService.upload(file, DOCUMENTS_FOLDER, RAW_TYPE);
+            document.setFileName(file.getOriginalFilename());
+            document.setCloudinaryPublicId(uploaded.publicId());
+            document.setFileUrl(uploaded.url());
+            document.setFileSize(file.getSize());
+            document.setContentType(file.getContentType() != null ? file.getContentType() : "application/octet-stream");
+        }
+
+        if (thumbnail != null && !thumbnail.isEmpty()) {
+            cloudinaryStorageService.delete(document.getThumbnailPublicId(), IMAGE_TYPE);
+            var uploadedThumbnail = cloudinaryStorageService.upload(thumbnail, THUMBNAILS_FOLDER, IMAGE_TYPE);
+            document.setThumbnailPublicId(uploadedThumbnail.publicId());
+            document.setThumbnailUrl(uploadedThumbnail.url());
+        }
+
+        return DocumentResponse.from(document);
+    }
+
+    private void requireOwnership(Document document, String currentUsername, boolean canManageAll, String action) {
+        if (!canManageAll && !document.getUploadedBy().equals(currentUsername)) {
+            throw new AccessDeniedException("Bạn chỉ có thể " + action + " tài liệu do chính mình đăng tải.");
+        }
     }
 
     @Transactional
