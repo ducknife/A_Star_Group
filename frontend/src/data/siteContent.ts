@@ -43,6 +43,6 @@ export const missionValues = [
 ];
 
 export const contactInfo = {
-  email: "contact@astarsquad.org",
+  email: "astarsquad@alandas.site",
   address: "Việt Nam",
 };
