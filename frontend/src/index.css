@@ -70,6 +70,109 @@ body {
   color: white;
 }
 
+/* Custom scrollbar: narrower than the browser default, perfectly square ends
+   (no rounded pill), matching the flat editorial design used everywhere else. */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-ink-400) transparent;
+}
+
+html.dark {
+  scrollbar-color: var(--color-ink-600) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-ink-400);
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-brand-600);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background-color: var(--color-ink-600);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-brand-500);
+}
+
+/* Custom checkbox: square box (no native rounded corners), brand-colored check mark. */
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.05rem;
+  height: 1.05rem;
+  flex-shrink: 0;
+  position: relative;
+  border: 1px solid var(--color-ink-300);
+  border-radius: 0;
+  background-color: var(--color-ink-0);
+  cursor: pointer;
+}
+
+.dark input[type="checkbox"] {
+  border-color: var(--color-ink-700);
+  background-color: var(--color-ink-950);
+}
+
+input[type="checkbox"]:checked {
+  background-color: var(--color-brand-600);
+  border-color: var(--color-brand-600);
+}
+
+input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 0.3rem;
+  top: 0.06rem;
+  width: 0.3rem;
+  height: 0.55rem;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--color-brand-600);
+  outline-offset: 2px;
+}
+
+/* Custom dropdown: strips the native OS chrome so the box stays perfectly
+   square and flat, with a hand-drawn chevron instead of the native arrow. */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  border-radius: 0;
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 0.7rem;
+  padding-right: 2.25rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%236c6e77' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.dark select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23cbccd1' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+select::-ms-expand {
+  display: none;
+}
+
 /* Harvard-Crimson-style uppercase kicker label, used above article/section headlines */
 .kicker {
   display: inline-flex;
