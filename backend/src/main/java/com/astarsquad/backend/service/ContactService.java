@@ -35,6 +35,11 @@ public class ContactService {
     }
 
     public void sendContactMessage(ContactRequest request) {
+        if (request.website() != null && !request.website().isBlank()) {
+            // Honeypot tripped — silently accept without sending so the bot gets no signal.
+            return;
+        }
+
         String text = """
                 Bạn có một lời nhắn mới từ website A* SQUAD:
 

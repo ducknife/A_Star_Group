@@ -4,6 +4,7 @@ export interface ContactRequest {
   name: string;
   email: string;
   message: string;
+  website?: string;
 }
 
 export const sendContactMessage = async (payload: ContactRequest): Promise<void> => {

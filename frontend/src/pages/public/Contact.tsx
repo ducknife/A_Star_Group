@@ -1,4 +1,5 @@
 import { type FormEvent, useState } from "react";
+import axios from "axios";
 import { Mail, MapPin, Send, CheckCircle2 } from "lucide-react";
 import { Container } from "../../components/ui/Container";
 import { SectionHeading } from "../../components/ui/SectionHeading";
@@ -12,18 +13,27 @@ export function Contact() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [website, setWebsite] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setStatus("sending");
+    setErrorMessage(null);
     try {
-      await sendContactMessage({ name, email, message });
+      await sendContactMessage({ name, email, message, website });
       setStatus("sent");
       setName("");
       setEmail("");
       setMessage("");
-    } catch {
+      setWebsite("");
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status === 429) {
+        setErrorMessage("Bạn đã gửi lời nhắn quá nhiều lần. Vui lòng thử lại sau ít phút.");
+      } else {
+        setErrorMessage("Gửi lời nhắn thất bại. Vui lòng thử lại sau.");
+      }
       setStatus("error");
     }
   };
@@ -71,7 +81,20 @@ export function Contact() {
               </Button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="relative space-y-5">
+              <div className="absolute left-[-9999px] top-0 h-0 w-0 overflow-hidden" aria-hidden="true">
+                <label htmlFor="website">Website</label>
+                <input
+                  id="website"
+                  name="website"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
+                />
+              </div>
+
               <TextField label="Họ và tên" required value={name} onChange={(e) => setName(e.target.value)} />
               <TextField
                 label="Email"
@@ -88,10 +111,8 @@ export function Contact() {
                 onChange={(e) => setMessage(e.target.value)}
               />
 
-              {status === "error" && (
-                <p className="text-sm text-red-600 dark:text-red-400">
-                  Gửi lời nhắn thất bại. Vui lòng thử lại sau.
-                </p>
+              {status === "error" && errorMessage && (
+                <p className="text-sm text-red-600 dark:text-red-400">{errorMessage}</p>
               )}
 
               <Button

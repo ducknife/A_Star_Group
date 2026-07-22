@@ -19,3 +19,17 @@ export const createAccount = async (payload: {
 export const deleteAccount = async (id: number): Promise<void> => {
   await api.delete(`/api/admin/accounts/${id}`);
 };
+
+export const getMyAccount = async (): Promise<Account> => {
+  const { data } = await api.get<Account>("/api/account/me");
+  return data;
+};
+
+export const updateMyAccount = async (payload: {
+  displayName?: string;
+  currentPassword?: string;
+  newPassword?: string;
+}): Promise<Account> => {
+  const { data } = await api.put<Account>("/api/account/me", payload);
+  return data;
+};

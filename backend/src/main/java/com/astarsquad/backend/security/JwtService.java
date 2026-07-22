@@ -15,6 +15,8 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
+    public static final String AUTH_COOKIE_NAME = "astarsquad_auth";
+
     private final SecretKey signingKey;
     private final long expirationMinutes;
 

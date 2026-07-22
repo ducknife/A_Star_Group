@@ -28,7 +28,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiErrorResponse> handleBadCredentials(BadCredentialsException ex, HttpServletRequest req) {
-        return build(HttpStatus.UNAUTHORIZED, "Sai tên đăng nhập hoặc mật khẩu.", req);
+        // Spring Security's own AuthenticationManager throws this with the generic
+        // "Bad credentials" message on login; our own code throws it with a specific
+        // message (e.g. wrong current password on a self-service update) — prefer that.
+        boolean isCustomMessage = ex.getMessage() != null && !ex.getMessage().equals("Bad credentials");
+        String message = isCustomMessage ? ex.getMessage() : "Sai tên đăng nhập hoặc mật khẩu.";
+        return build(HttpStatus.UNAUTHORIZED, message, req);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -63,6 +68,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(FileStorageException.class)
     public ResponseEntity<ApiErrorResponse> handleFileStorage(FileStorageException ex, HttpServletRequest req) {
         return build(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), req);
+    }
+
+    @ExceptionHandler(TooManyRequestsException.class)
+    public ResponseEntity<ApiErrorResponse> handleTooManyRequests(TooManyRequestsException ex, HttpServletRequest req) {
+        return build(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage(), req);
     }
 
     @ExceptionHandler(Exception.class)

@@ -45,13 +45,6 @@ export interface Account {
   createdAt: string;
 }
 
-export interface AuthResponse {
-  token: string;
-  username: string;
-  role: AccountRole;
-  expiresAt: string;
-}
-
 export interface ApiError {
   status: number;
   message: string;

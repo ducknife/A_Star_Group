@@ -1,47 +1,46 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
-import { api, AUTH_STORAGE_KEY } from "../lib/api";
-import type { AccountRole, AuthResponse } from "../types";
-
-interface StoredAuth {
-  token: string;
-  username: string;
-  role: AccountRole;
-}
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { api } from "../lib/api";
+import type { Account } from "../types";
 
 interface AuthContextValue {
-  auth: StoredAuth | null;
+  auth: Account | null;
+  checkingSession: boolean;
   login: (username: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-function readStoredAuth(): StoredAuth | null {
-  const raw = localStorage.getItem(AUTH_STORAGE_KEY);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as StoredAuth;
-  } catch {
-    return null;
-  }
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [auth, setAuth] = useState<StoredAuth | null>(readStoredAuth);
+  const [auth, setAuth] = useState<Account | null>(null);
+  const [checkingSession, setCheckingSession] = useState(true);
+
+  useEffect(() => {
+    api
+      .get<Account>("/api/auth/me")
+      .then(({ data }) => setAuth(data))
+      .catch(() => setAuth(null))
+      .finally(() => setCheckingSession(false));
+  }, []);
 
   const login = async (username: string, password: string) => {
-    const { data } = await api.post<AuthResponse>("/api/auth/login", { username, password });
-    const stored: StoredAuth = { token: data.token, username: data.username, role: data.role };
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(stored));
-    setAuth(stored);
+    const { data } = await api.post<Account>("/api/auth/login", { username, password });
+    setAuth(data);
   };
 
-  const logout = () => {
-    localStorage.removeItem(AUTH_STORAGE_KEY);
-    setAuth(null);
+  const logout = async () => {
+    try {
+      await api.post("/api/auth/logout");
+    } finally {
+      setAuth(null);
+    }
   };
 
-  return <AuthContext.Provider value={{ auth, login, logout }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ auth, checkingSession, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {

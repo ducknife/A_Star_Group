@@ -3,6 +3,7 @@ import { PublicLayout } from "./components/layout/PublicLayout";
 import { AdminLayout } from "./components/layout/AdminLayout";
 import { ProtectedRoute } from "./components/layout/ProtectedRoute";
 import { ScrollToTop } from "./components/layout/ScrollToTop";
+import { ScrollToTopButton } from "./components/ui/ScrollToTopButton";
 
 import { Home } from "./pages/public/Home";
 import { About } from "./pages/public/About";
@@ -18,11 +19,13 @@ import { Dashboard } from "./pages/admin/Dashboard";
 import { MembersAdmin } from "./pages/admin/MembersAdmin";
 import { DocumentsAdmin } from "./pages/admin/DocumentsAdmin";
 import { AccountsAdmin } from "./pages/admin/AccountsAdmin";
+import { MyAccount } from "./pages/admin/MyAccount";
 
 function App() {
   return (
     <>
       <ScrollToTop />
+      <ScrollToTopButton />
       <Routes>
         <Route element={<PublicLayout />}>
           <Route index element={<Home />} />
@@ -53,6 +56,7 @@ function App() {
             }
           />
           <Route path="documents" element={<DocumentsAdmin />} />
+          <Route path="tai-khoan-cua-toi" element={<MyAccount />} />
           <Route
             path="accounts"
             element={

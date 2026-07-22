@@ -1,18 +1,18 @@
 import { NavLink, Outlet } from "react-router-dom";
-import { LayoutDashboard, Users, FileText, ShieldCheck, LogOut, ExternalLink } from "lucide-react";
+import { LayoutDashboard, Users, FileText, ShieldCheck, UserCog, LogOut, ExternalLink } from "lucide-react";
 import clsx from "clsx";
 import { useAuth } from "../../context/AuthContext";
 import { ThemeToggle } from "./ThemeToggle";
 import { ACCOUNT_ROLE_LABELS, ORG_NAME } from "../../lib/constants";
 import type { AccountRole } from "../../types";
 import logo from "../../assets/images/logo.png";
-import { ScrollToTopButton } from "../ui/ScrollToTopButton";
 
 const ADMIN_LINKS: Array<{ to: string; label: string; icon: typeof LayoutDashboard; roles: AccountRole[] }> = [
   { to: "/admin", label: "Tổng quan", icon: LayoutDashboard, roles: ["ADMIN", "MOD", "MEMBER"] },
   { to: "/admin/members", label: "Thành viên", icon: Users, roles: ["ADMIN", "MOD"] },
   { to: "/admin/documents", label: "Tài liệu", icon: FileText, roles: ["ADMIN", "MOD", "MEMBER"] },
   { to: "/admin/accounts", label: "Tài khoản", icon: ShieldCheck, roles: ["ADMIN"] },
+  { to: "/admin/tai-khoan-cua-toi", label: "Tài khoản của tôi", icon: UserCog, roles: ["ADMIN", "MOD", "MEMBER"] },
 ];
 
 export function AdminLayout() {
@@ -89,7 +89,6 @@ export function AdminLayout() {
           <Outlet />
         </main>
       </div>
-      <ScrollToTopButton />
     </div>
   );
 }
