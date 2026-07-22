@@ -31,7 +31,7 @@
   --color-ink-950: #0a0a0c;
 
   --font-serif: "Playfair Display", "Times New Roman", serif;
-  --font-sans: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-script: "Dancing Script", cursive;
 
   --animate-fade-up: fade-up 0.6s ease both;
