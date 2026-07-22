@@ -3,6 +3,7 @@ package com.astarsquad.backend.controller;
 import com.astarsquad.backend.dto.DocumentResponse;
 import com.astarsquad.backend.dto.PageResponse;
 import com.astarsquad.backend.entity.DocumentCategory;
+import com.astarsquad.backend.exception.FileStorageException;
 import com.astarsquad.backend.service.DocumentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -12,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -50,9 +52,24 @@ public class DocumentController {
     public ResponseEntity<Resource> download(@PathVariable Long id) throws MalformedURLException {
         var payload = documentService.prepareDownload(id);
         Resource resource = new UrlResource(URI.create(payload.url()));
+
+        long contentLength;
+        try {
+            // Forces the actual fetch from Cloudinary to happen here instead of later,
+            // deep inside Spring's response-writing machinery where it's much harder to
+            // turn into a clear error. The most common cause of a failure at this point
+            // is Cloudinary's "Restricted media types" setting blocking PDF/ZIP delivery
+            // for "raw" resources — an account setting, not something code can fix.
+            contentLength = resource.contentLength();
+        } catch (IOException ex) {
+            throw new FileStorageException(
+                    "Không thể tải tệp tài liệu này từ máy chủ lưu trữ. Vui lòng liên hệ quản trị viên.", ex);
+        }
+
         String encodedName = URLEncoder.encode(payload.fileName(), StandardCharsets.UTF_8).replace("+", "%20");
 
         return ResponseEntity.ok()
+                .contentLength(contentLength)
                 .contentType(MediaType.parseMediaType(payload.contentType()))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedName)
                 .body(resource);

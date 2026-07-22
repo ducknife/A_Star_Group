@@ -67,6 +67,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(FileStorageException.class)
     public ResponseEntity<ApiErrorResponse> handleFileStorage(FileStorageException ex, HttpServletRequest req) {
+        log.error("File storage error on {} {}", req.getMethod(), req.getRequestURI(), ex);
         return build(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), req);
     }
 
