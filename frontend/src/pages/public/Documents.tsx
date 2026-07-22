@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import clsx from "clsx";
 import { Container } from "../../components/ui/Container";
@@ -9,24 +9,28 @@ import { Pagination } from "../../components/ui/Pagination";
 import { LoadingState, ErrorState, EmptyState } from "../../components/ui/StateMessage";
 import { useFetch } from "../../hooks/useFetch";
 import { listDocuments } from "../../lib/documents";
-import { DOCUMENT_CATEGORY_LABELS } from "../../lib/constants";
+import { useTranslation } from "../../lib/translations";
 import type { DocumentCategory } from "../../types";
 
 const PAGE_SIZE = 8;
-
-const CATEGORIES: Array<{ key: DocumentCategory | "ALL"; label: string }> = [
-  { key: "ALL", label: "Tất cả" },
-  ...(Object.entries(DOCUMENT_CATEGORY_LABELS) as Array<[DocumentCategory, string]>).map(([key, label]) => ({
-    key,
-    label,
-  })),
-];
 
 export function Documents() {
   const [category, setCategory] = useState<DocumentCategory | "ALL">("ALL");
   const [inputValue, setInputValue] = useState("");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
+  const { t } = useTranslation();
+
+  const categories: Array<{ key: DocumentCategory | "ALL"; label: string }> = useMemo(
+    () => [
+      { key: "ALL", label: t.documents.all },
+      ...(Object.entries(t.categories) as Array<[DocumentCategory, string]>).map(([key, label]) => ({
+        key,
+        label,
+      })),
+    ],
+    [t],
+  );
 
   // Auto-search shortly after typing stops; Enter/button below commits instantly.
   useEffect(() => {
@@ -59,16 +63,16 @@ export function Documents() {
     <section className="py-20">
       <Container>
         <SectionHeading
-          eyebrow="Kho lưu trữ"
-          title="Tài liệu"
-          description="Tài liệu, hướng dẫn học bổng và biểu mẫu được A* SQUAD tổng hợp và chia sẻ cho cộng đồng."
+          eyebrow={t.documents.eyebrow}
+          title={t.documents.title}
+          description={t.documents.description}
           align="center"
           className="mx-auto"
         />
 
         <div className="mx-auto mt-10 max-w-3xl">
           <div className="flex flex-wrap justify-center gap-2">
-            {CATEGORIES.map((c) => (
+            {categories.map((c) => (
               <button
                 key={c.key}
                 type="button"
@@ -97,23 +101,21 @@ export function Documents() {
               <input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Tìm theo tiêu đề, mô tả..."
+                placeholder={t.documents.searchPlaceholder}
                 className="w-full border border-ink-300 bg-white py-2.5 pl-11 pr-4 text-sm text-ink-800 outline-none transition-colors focus:border-brand-600 dark:border-ink-700 dark:bg-ink-900 dark:text-ink-100"
               />
             </div>
             <Button type="submit" icon={<Search size={16} />}>
-              Tìm kiếm
+              {t.documents.search}
             </Button>
           </form>
         </div>
 
         <div className="mt-12">
-          {loading && <LoadingState label="Đang tải tài liệu..." />}
+          {loading && <LoadingState label={t.documents.loading} />}
           {error && <ErrorState message={error} />}
           {data && data.content.length === 0 && (
-            <EmptyState
-              message={search ? "Không tìm thấy tài liệu phù hợp." : "Chưa có tài liệu nào trong danh mục này."}
-            />
+            <EmptyState message={search ? t.documents.noResults : t.documents.empty} />
           )}
           {data && data.content.length > 0 && (
             <>

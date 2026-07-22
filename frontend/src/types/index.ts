@@ -6,6 +6,7 @@ export interface Member {
   major?: string;
   graduationYear?: number;
   bio?: string;
+  bioEn?: string;
   photoUrl?: string;
   linkedinUrl?: string;
   githubUrl?: string;
@@ -24,7 +25,9 @@ export type DocumentCategory =
 export interface AppDocument {
   id: number;
   title: string;
+  titleEn?: string;
   description?: string;
+  descriptionEn?: string;
   category: DocumentCategory;
   fileName: string;
   thumbnailUrl: string;

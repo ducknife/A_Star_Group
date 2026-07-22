@@ -29,14 +29,18 @@ export const documentDownloadUrl = (id: number): string => `${API_BASE_URL}/api/
 
 export const createDocument = async (payload: {
   title: string;
+  titleEn?: string;
   description?: string;
+  descriptionEn?: string;
   category: DocumentCategory;
   file: File;
   thumbnail: File;
 }): Promise<AppDocument> => {
   const form = new FormData();
   form.append("title", payload.title);
+  if (payload.titleEn) form.append("titleEn", payload.titleEn);
   if (payload.description) form.append("description", payload.description);
+  if (payload.descriptionEn) form.append("descriptionEn", payload.descriptionEn);
   form.append("category", payload.category);
   form.append("file", payload.file);
   form.append("thumbnail", payload.thumbnail);
@@ -50,7 +54,9 @@ export const updateDocument = async (
   id: number,
   payload: {
     title: string;
+    titleEn?: string;
     description?: string;
+    descriptionEn?: string;
     category: DocumentCategory;
     file?: File;
     thumbnail?: File;
@@ -58,7 +64,9 @@ export const updateDocument = async (
 ): Promise<AppDocument> => {
   const form = new FormData();
   form.append("title", payload.title);
+  if (payload.titleEn) form.append("titleEn", payload.titleEn);
   if (payload.description) form.append("description", payload.description);
+  if (payload.descriptionEn) form.append("descriptionEn", payload.descriptionEn);
   form.append("category", payload.category);
   if (payload.file) form.append("file", payload.file);
   if (payload.thumbnail) form.append("thumbnail", payload.thumbnail);

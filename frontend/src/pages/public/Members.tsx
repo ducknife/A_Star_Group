@@ -6,10 +6,12 @@ import { MemberCard } from "../../components/members/MemberCard";
 import { LoadingState, ErrorState, EmptyState } from "../../components/ui/StateMessage";
 import { useFetch } from "../../hooks/useFetch";
 import { listMembers } from "../../lib/members";
+import { useTranslation } from "../../lib/translations";
 
 export function Members() {
   const { data, loading, error } = useFetch(() => listMembers(), []);
   const [query, setQuery] = useState("");
+  const { t } = useTranslation();
 
   const filtered = useMemo(() => {
     if (!data) return [];
@@ -27,9 +29,9 @@ export function Members() {
     <section className="py-20">
       <Container>
         <SectionHeading
-          eyebrow="Cộng đồng A* SQUAD"
-          title="Thành viên"
-          description="Những cá nhân xuất sắc đã đạt học bổng và cùng đồng hành trong cộng đồng A* SQUAD."
+          eyebrow={t.members.eyebrow}
+          title={t.members.title}
+          description={t.members.description}
           align="center"
           className="mx-auto"
         />
@@ -39,16 +41,16 @@ export function Members() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Tìm theo tên, trường, học bổng..."
+            placeholder={t.members.searchPlaceholder}
             className="w-full border border-ink-300 bg-white py-2.5 pl-11 pr-4 text-sm text-ink-800 outline-none transition-colors focus:border-brand-600 dark:border-ink-700 dark:bg-ink-900 dark:text-ink-100"
           />
         </div>
 
         <div className="mt-14">
-          {loading && <LoadingState label="Đang tải danh sách thành viên..." />}
+          {loading && <LoadingState label={t.members.loading} />}
           {error && <ErrorState message={error} />}
           {data && filtered.length === 0 && (
-            <EmptyState message={query ? "Không tìm thấy thành viên phù hợp." : "Chưa có thành viên nào được thêm."} />
+            <EmptyState message={query ? t.members.noResults : t.members.empty} />
           )}
           {filtered.length > 0 && (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

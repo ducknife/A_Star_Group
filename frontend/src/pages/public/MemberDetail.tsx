@@ -5,6 +5,7 @@ import { Container } from "../../components/ui/Container";
 import { LoadingState, ErrorState } from "../../components/ui/StateMessage";
 import { useFetch } from "../../hooks/useFetch";
 import { getMember } from "../../lib/members";
+import { useTranslation, pickLangOptional } from "../../lib/translations";
 import type { Member } from "../../types";
 
 function LinkedinIcon() {
@@ -23,11 +24,11 @@ function GithubIcon() {
   );
 }
 
-function SocialLinks({ member }: { member: Member }) {
+function SocialLinks({ member, otherLabel }: { member: Member; otherLabel: string }) {
   const links = [
     member.linkedinUrl && { href: member.linkedinUrl, label: "LinkedIn", icon: <LinkedinIcon /> },
     member.githubUrl && { href: member.githubUrl, label: "GitHub", icon: <GithubIcon /> },
-    member.otherUrl && { href: member.otherUrl, label: "Liên kết", icon: <Link2 size={16} /> },
+    member.otherUrl && { href: member.otherUrl, label: otherLabel, icon: <Link2 size={16} /> },
   ].filter(Boolean) as Array<{ href: string; label: string; icon: ReactNode }>;
 
   if (links.length === 0) return null;
@@ -53,9 +54,12 @@ function SocialLinks({ member }: { member: Member }) {
 export function MemberDetail() {
   const { id } = useParams<{ id: string }>();
   const { data: member, loading, error } = useFetch(() => getMember(Number(id)), [id]);
+  const { t, language } = useTranslation();
 
-  if (loading) return <LoadingState label="Đang tải hồ sơ thành viên..." />;
-  if (error || !member) return <ErrorState message="Không tìm thấy thành viên này." />;
+  if (loading) return <LoadingState label={t.memberDetail.loading} />;
+  if (error || !member) return <ErrorState message={t.memberDetail.notFound} />;
+
+  const bio = pickLangOptional(language, member.bio, member.bioEn);
 
   return (
     <section className="py-16">
@@ -65,7 +69,7 @@ export function MemberDetail() {
           className="inline-flex items-center gap-1.5 text-sm font-medium text-ink-500 hover:text-brand-600 dark:text-ink-400"
         >
           <ArrowLeft size={15} />
-          Quay lại danh sách thành viên
+          {t.memberDetail.back}
         </Link>
 
         <div className="mt-8 grid gap-10 border border-ink-200 dark:border-ink-800 md:grid-cols-[280px_1fr]">
@@ -91,11 +95,11 @@ export function MemberDetail() {
               {member.graduationYear ? ` (${member.graduationYear})` : ""}
             </p>
 
-            {member.bio && (
-              <p className="mt-6 text-base leading-relaxed text-ink-600 dark:text-ink-300">{member.bio}</p>
+            {bio && (
+              <p className="mt-6 text-base leading-relaxed text-ink-600 dark:text-ink-300">{bio}</p>
             )}
 
-            <SocialLinks member={member} />
+            <SocialLinks member={member} otherLabel={t.memberDetail.otherLink} />
           </div>
         </div>
       </Container>

@@ -14,15 +14,12 @@ export const ACCOUNT_ROLE_LABELS: Record<AccountRole, string> = {
   MEMBER: "Thành viên",
 };
 
-export const MARQUEE_ITEMS = ["TRI THỨC", "KẾT NỐI", "CHIA SẺ", "PHÁT TRIỂN", "HỌC BỔNG", "CỘNG ĐỒNG"];
-
-export const NAV_LINKS = [
-  { to: "/", label: "Trang chủ" },
-  { to: "/gioi-thieu", label: "Giới thiệu" },
-  { to: "/thanh-vien", label: "Thành viên" },
-  { to: "/tai-lieu", label: "Tài liệu" },
-  { to: "/lien-he", label: "Liên hệ" },
+export const NAV_LINKS: Array<{ to: string; key: "home" | "about" | "members" | "documents" | "contact" }> = [
+  { to: "/", key: "home" },
+  { to: "/gioi-thieu", key: "about" },
+  { to: "/thanh-vien", key: "members" },
+  { to: "/tai-lieu", key: "documents" },
+  { to: "/lien-he", key: "contact" },
 ];
 
 export const ORG_NAME = "A* SQUAD";
-export const ORG_TAGLINE = "Học bổng là khởi đầu, tri thức là hành trình.";

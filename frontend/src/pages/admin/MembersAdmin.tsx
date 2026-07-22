@@ -19,6 +19,7 @@ const emptyForm: FormState = {
   major: "",
   graduationYear: undefined,
   bio: "",
+  bioEn: "",
   photoUrl: "",
   linkedinUrl: "",
   githubUrl: "",
@@ -172,6 +173,11 @@ export function MembersAdmin() {
               label="Giới thiệu ngắn"
               value={form.bio ?? ""}
               onChange={(e) => setForm({ ...form, bio: e.target.value })}
+            />
+            <TextAreaField
+              label="Giới thiệu ngắn (Tiếng Anh, không bắt buộc)"
+              value={form.bioEn ?? ""}
+              onChange={(e) => setForm({ ...form, bioEn: e.target.value })}
             />
             <div className="grid grid-cols-2 gap-4">
               <TextField

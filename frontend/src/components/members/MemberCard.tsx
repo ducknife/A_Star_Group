@@ -1,8 +1,13 @@
 import { Link } from "react-router-dom";
 import { Card } from "../ui/Card";
+import { useLanguage } from "../../context/LanguageContext";
+import { pickLangOptional } from "../../lib/translations";
 import type { Member } from "../../types";
 
 export function MemberCard({ member }: { member: Member }) {
+  const { language } = useLanguage();
+  const bio = pickLangOptional(language, member.bio, member.bioEn);
+
   return (
     <Link to={`/thanh-vien/${member.id}`} className="block h-full">
       <Card className="flex h-full flex-col">
@@ -26,9 +31,9 @@ export function MemberCard({ member }: { member: Member }) {
             {member.major ? ` — ${member.major}` : ""}
           </p>
 
-          {member.bio && (
+          {bio && (
             <p className="mt-3 line-clamp-3 flex-1 text-sm leading-relaxed text-ink-500 dark:text-ink-400">
-              {member.bio}
+              {bio}
             </p>
           )}
         </div>

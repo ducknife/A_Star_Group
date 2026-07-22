@@ -6,10 +6,13 @@ import { SectionHeading } from "../../components/ui/SectionHeading";
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
 import { TextField, TextAreaField } from "../../components/ui/Field";
-import { contactInfo } from "../../data/siteContent";
+import { siteContent } from "../../data/siteContent";
 import { sendContactMessage } from "../../lib/contact";
+import { useTranslation } from "../../lib/translations";
 
 export function Contact() {
+  const { t, language } = useTranslation();
+  const contactInfo = siteContent[language].contactInfo;
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -30,9 +33,9 @@ export function Contact() {
       setWebsite("");
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.status === 429) {
-        setErrorMessage("Bạn đã gửi lời nhắn quá nhiều lần. Vui lòng thử lại sau ít phút.");
+        setErrorMessage(t.contact.rateLimited);
       } else {
-        setErrorMessage("Gửi lời nhắn thất bại. Vui lòng thử lại sau.");
+        setErrorMessage(t.contact.genericError);
       }
       setStatus("error");
     }
@@ -42,24 +45,20 @@ export function Contact() {
     <section className="py-20">
       <Container className="grid gap-14 lg:grid-cols-2">
         <div>
-          <SectionHeading
-            eyebrow="Kết nối với chúng tôi"
-            title="Liên hệ"
-            description="Bạn quan tâm đến A* SQUAD, muốn hợp tác hoặc có câu hỏi? Gửi lời nhắn cho chúng tôi."
-          />
+          <SectionHeading eyebrow={t.contact.eyebrow} title={t.contact.title} description={t.contact.description} />
 
           <div className="mt-10 space-y-4">
             <Card className="flex items-center gap-4 p-5">
               <Mail size={20} className="text-brand-600" />
               <div>
-                <p className="text-sm text-ink-400">Email</p>
+                <p className="text-sm text-ink-400">{t.contact.email}</p>
                 <p className="font-medium text-ink-900 dark:text-white">{contactInfo.email}</p>
               </div>
             </Card>
             <Card className="flex items-center gap-4 p-5">
               <MapPin size={20} className="text-brand-600" />
               <div>
-                <p className="text-sm text-ink-400">Địa chỉ</p>
+                <p className="text-sm text-ink-400">{t.contact.address}</p>
                 <p className="font-medium text-ink-900 dark:text-white">{contactInfo.address}</p>
               </div>
             </Card>
@@ -71,13 +70,11 @@ export function Contact() {
             <div className="flex flex-col items-center py-8 text-center">
               <CheckCircle2 size={32} className="text-brand-600" />
               <p className="mt-4 font-serif text-lg font-semibold text-ink-900 dark:text-white">
-                Đã gửi lời nhắn thành công
+                {t.contact.sentTitle}
               </p>
-              <p className="mt-1 text-sm text-ink-500 dark:text-ink-400">
-                Chúng tôi sẽ phản hồi bạn qua email sớm nhất có thể.
-              </p>
+              <p className="mt-1 text-sm text-ink-500 dark:text-ink-400">{t.contact.sentSubtitle}</p>
               <Button variant="ghost" size="sm" className="mt-6" onClick={() => setStatus("idle")}>
-                Gửi lời nhắn khác
+                {t.contact.sendAnother}
               </Button>
             </div>
           ) : (
@@ -95,16 +92,21 @@ export function Contact() {
                 />
               </div>
 
-              <TextField label="Họ và tên" required value={name} onChange={(e) => setName(e.target.value)} />
               <TextField
-                label="Email"
+                label={t.contact.fullName}
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              <TextField
+                label={t.contact.email}
                 required
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
               <TextAreaField
-                label="Lời nhắn"
+                label={t.contact.message}
                 required
                 rows={5}
                 value={message}
@@ -121,7 +123,7 @@ export function Contact() {
                 disabled={status === "sending"}
                 icon={<Send size={16} />}
               >
-                {status === "sending" ? "Đang gửi..." : "Gửi lời nhắn"}
+                {status === "sending" ? t.contact.sending : t.contact.send}
               </Button>
             </form>
           )}

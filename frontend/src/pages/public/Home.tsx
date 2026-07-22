@@ -12,8 +12,8 @@ import { LoadingState, ErrorState, EmptyState } from "../../components/ui/StateM
 import { useFetch } from "../../hooks/useFetch";
 import { listMembers } from "../../lib/members";
 import { listDocuments } from "../../lib/documents";
-import { hero, stats, about, missionValues } from "../../data/siteContent";
-import { ORG_TAGLINE, MARQUEE_ITEMS } from "../../lib/constants";
+import { siteContent } from "../../data/siteContent";
+import { useTranslation } from "../../lib/translations";
 import logo from "../../assets/images/logo.png";
 import iconPencil from "../../assets/images/3d/pencil.png";
 import iconRocket from "../../assets/images/3d/rocket.png";
@@ -21,6 +21,8 @@ import iconRocket from "../../assets/images/3d/rocket.png";
 export function Home() {
   const members = useFetch(() => listMembers(true), []);
   const documents = useFetch(() => listDocuments({ size: 3 }), []);
+  const { t, language } = useTranslation();
+  const content = siteContent[language];
 
   return (
     <>
@@ -28,22 +30,22 @@ export function Home() {
       <section className="border-b border-ink-200 bg-ink-50 dark:border-ink-800 dark:bg-ink-900/40">
         <Container className="grid gap-12 py-20 lg:grid-cols-2 lg:items-center lg:py-28">
           <div>
-            <p className="kicker">{hero.eyebrow}</p>
+            <p className="kicker">{content.hero.eyebrow}</p>
             <h1 className="mt-3 font-serif text-4xl font-semibold leading-tight tracking-tight text-ink-900 dark:text-white sm:text-5xl">
-              {hero.title}
+              {content.hero.title}
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-500 dark:text-ink-300">
-              {hero.subtitle}
+              {content.hero.subtitle}
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
               <Link to="/thanh-vien">
                 <Button size="lg" icon={<Users size={18} />}>
-                  Khám phá thành viên
+                  {t.home.exploreMembers}
                 </Button>
               </Link>
               <Link to="/tai-lieu">
                 <Button variant="ghost" size="lg" icon={<FileText size={18} />}>
-                  Kho tài liệu
+                  {t.home.documentLibrary}
                 </Button>
               </Link>
             </div>
@@ -61,18 +63,18 @@ export function Home() {
                 className="absolute -bottom-6 -right-4 w-28 rotate-6 drop-shadow-xl sm:-bottom-8 sm:-right-6 sm:w-32"
               />
             </div>
-            <p className="mt-8 font-script text-2xl text-brand-600 dark:text-brand-400">{ORG_TAGLINE}</p>
+            <p className="mt-8 font-script text-2xl text-brand-600 dark:text-brand-400">{content.tagline}</p>
           </div>
         </Container>
       </section>
 
       {/* Marquee */}
-      <Marquee items={MARQUEE_ITEMS} />
+      <Marquee items={content.marqueeItems} />
 
       {/* Stats */}
       <section className="border-b border-ink-200 bg-ink-50 dark:border-ink-800 dark:bg-ink-900/40">
         <Container className="grid grid-cols-2 gap-8 py-12 lg:grid-cols-4">
-          {stats.map((stat) => (
+          {content.stats.map((stat) => (
             <div key={stat.label} className="text-center">
               <CountUp
                 value={stat.value}
@@ -87,9 +89,9 @@ export function Home() {
       {/* About summary */}
       <section className="py-24">
         <Container className="grid gap-12 lg:grid-cols-2 lg:items-center">
-          <SectionHeading eyebrow={about.eyebrow} title={about.title} align="left" />
+          <SectionHeading eyebrow={content.about.eyebrow} title={content.about.title} align="left" />
           <div className="space-y-4">
-            {about.paragraphs.map((p) => (
+            {content.about.paragraphs.map((p) => (
               <p key={p} className="leading-relaxed text-ink-500 dark:text-ink-300">
                 {p}
               </p>
@@ -98,7 +100,7 @@ export function Home() {
               to="/gioi-thieu"
               className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400"
             >
-              Tìm hiểu thêm về chúng tôi <ArrowRight size={15} />
+              {t.home.learnMore} <ArrowRight size={15} />
             </Link>
           </div>
         </Container>
@@ -108,13 +110,13 @@ export function Home() {
       <section className="bg-ink-50 py-24 dark:bg-ink-900/40">
         <Container>
           <SectionHeading
-            eyebrow="Giá trị cốt lõi"
-            title="Sứ mệnh của A* SQUAD"
+            eyebrow={t.home.coreValuesEyebrow}
+            title={t.home.missionTitle}
             align="center"
             className="mx-auto"
           />
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {missionValues.map((value, i) => (
+            {content.missionValues.map((value, i) => (
               <Card key={value.title} className="p-6">
                 <span className="font-serif text-3xl font-bold text-brand-200 dark:text-brand-900">
                   {String(i + 1).padStart(2, "0")}
@@ -135,20 +137,20 @@ export function Home() {
       <section className="py-24">
         <Container>
           <div className="flex flex-wrap items-end justify-between gap-4">
-            <SectionHeading eyebrow="Con người" title="Thành viên tiêu biểu" />
+            <SectionHeading eyebrow={t.home.peopleEyebrow} title={t.home.featuredMembersTitle} />
             <Link
               to="/thanh-vien"
               className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400"
             >
-              Xem tất cả <ArrowRight size={15} />
+              {t.home.viewAll} <ArrowRight size={15} />
             </Link>
           </div>
 
           <div className="mt-12">
-            {members.loading && <LoadingState label="Đang tải danh sách thành viên..." />}
+            {members.loading && <LoadingState label={t.home.loadingMembers} />}
             {members.error && <ErrorState message={members.error} />}
             {members.data && members.data.length === 0 && (
-              <EmptyState message="Chưa có thành viên nổi bật nào được thêm." />
+              <EmptyState message={t.home.noFeaturedMembers} />
             )}
             {members.data && members.data.length > 0 && (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -165,20 +167,20 @@ export function Home() {
       <section className="bg-ink-50 py-24 dark:bg-ink-900/40">
         <Container>
           <div className="flex flex-wrap items-end justify-between gap-4">
-            <SectionHeading eyebrow="Tài nguyên" title="Tài liệu mới nhất" />
+            <SectionHeading eyebrow={t.home.resourcesEyebrow} title={t.home.latestDocumentsTitle} />
             <Link
               to="/tai-lieu"
               className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400"
             >
-              Xem kho tài liệu <ArrowRight size={15} />
+              {t.home.viewDocumentLibrary} <ArrowRight size={15} />
             </Link>
           </div>
 
           <div className="mt-12">
-            {documents.loading && <LoadingState label="Đang tải tài liệu..." />}
+            {documents.loading && <LoadingState label={t.home.loadingDocuments} />}
             {documents.error && <ErrorState message={documents.error} />}
             {documents.data && documents.data.content.length === 0 && (
-              <EmptyState message="Chưa có tài liệu nào được đăng tải." />
+              <EmptyState message={t.home.noDocuments} />
             )}
             {documents.data && documents.data.content.length > 0 && (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -201,16 +203,11 @@ export function Home() {
               aria-hidden
               className="pointer-events-none absolute -right-6 -top-8 w-24 rotate-12 opacity-90 sm:w-32"
             />
-            <h2 className="font-serif text-3xl font-semibold text-white sm:text-4xl">
-              Trở thành một phần của A* SQUAD
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-brand-50">
-              Bạn là học sinh, sinh viên đạt học bổng và muốn kết nối với cộng đồng? Hãy liên hệ với chúng
-              tôi.
-            </p>
+            <h2 className="font-serif text-3xl font-semibold text-white sm:text-4xl">{t.home.ctaTitle}</h2>
+            <p className="mx-auto mt-4 max-w-xl text-brand-50">{t.home.ctaSubtitle}</p>
             <Link to="/lien-he" className="mt-8 inline-block">
               <Button variant="secondary" size="lg">
-                Liên hệ ngay
+                {t.home.contactNow}
               </Button>
             </Link>
           </div>

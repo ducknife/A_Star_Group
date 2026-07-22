@@ -25,7 +25,9 @@ export function DocumentsAdmin() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<AppDocument | null>(null);
   const [title, setTitle] = useState("");
+  const [titleEn, setTitleEn] = useState("");
   const [description, setDescription] = useState("");
+  const [descriptionEn, setDescriptionEn] = useState("");
   const [category, setCategory] = useState<DocumentCategory>("SCHOLARSHIP_GUIDE");
   const [file, setFile] = useState<File | null>(null);
   const [thumbnail, setThumbnail] = useState<File | null>(null);
@@ -33,7 +35,9 @@ export function DocumentsAdmin() {
 
   const resetForm = () => {
     setTitle("");
+    setTitleEn("");
     setDescription("");
+    setDescriptionEn("");
     setCategory("SCHOLARSHIP_GUIDE");
     setFile(null);
     setThumbnail(null);
@@ -48,7 +52,9 @@ export function DocumentsAdmin() {
   const openEdit = (doc: AppDocument) => {
     setEditing(doc);
     setTitle(doc.title);
+    setTitleEn(doc.titleEn ?? "");
     setDescription(doc.description ?? "");
+    setDescriptionEn(doc.descriptionEn ?? "");
     setCategory(doc.category);
     setFile(null);
     setThumbnail(null);
@@ -59,10 +65,18 @@ export function DocumentsAdmin() {
     setSaving(true);
     try {
       if (editing) {
-        await updateDocument(editing.id, { title, description, category, file: file ?? undefined, thumbnail: thumbnail ?? undefined });
+        await updateDocument(editing.id, {
+          title,
+          titleEn,
+          description,
+          descriptionEn,
+          category,
+          file: file ?? undefined,
+          thumbnail: thumbnail ?? undefined,
+        });
       } else {
         if (!file || !thumbnail) return;
-        await createDocument({ title, description, category, file, thumbnail });
+        await createDocument({ title, titleEn, description, descriptionEn, category, file, thumbnail });
       }
       setShowForm(false);
       resetForm();
@@ -146,10 +160,20 @@ export function DocumentsAdmin() {
             }}
           >
             <TextField label="Tiêu đề" required value={title} onChange={(e) => setTitle(e.target.value)} />
+            <TextField
+              label="Tiêu đề (Tiếng Anh, không bắt buộc)"
+              value={titleEn}
+              onChange={(e) => setTitleEn(e.target.value)}
+            />
             <TextAreaField
               label="Tóm tắt ngắn"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+            />
+            <TextAreaField
+              label="Tóm tắt ngắn (Tiếng Anh, không bắt buộc)"
+              value={descriptionEn}
+              onChange={(e) => setDescriptionEn(e.target.value)}
             />
             <SelectField
               label="Danh mục"

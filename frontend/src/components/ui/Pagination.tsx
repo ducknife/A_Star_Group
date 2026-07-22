@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import clsx from "clsx";
+import { useTranslation } from "../../lib/translations";
 
 interface PaginationProps {
   page: number;
@@ -8,6 +9,7 @@ interface PaginationProps {
 }
 
 export function Pagination({ page, totalPages, onChange }: PaginationProps) {
+  const { t } = useTranslation();
   if (totalPages <= 1) return null;
 
   const pages = Array.from({ length: totalPages }, (_, i) => i).filter(
@@ -20,7 +22,7 @@ export function Pagination({ page, totalPages, onChange }: PaginationProps) {
         type="button"
         disabled={page === 0}
         onClick={() => onChange(page - 1)}
-        aria-label="Trang trước"
+        aria-label={t.common.prevPage}
         className="inline-flex h-9 w-9 items-center justify-center border border-ink-300 text-ink-600 transition-colors hover:border-brand-600 hover:text-brand-600 disabled:opacity-40 disabled:pointer-events-none dark:border-ink-700 dark:text-ink-300"
       >
         <ChevronLeft size={16} />
@@ -48,7 +50,7 @@ export function Pagination({ page, totalPages, onChange }: PaginationProps) {
         type="button"
         disabled={page >= totalPages - 1}
         onClick={() => onChange(page + 1)}
-        aria-label="Trang sau"
+        aria-label={t.common.nextPage}
         className="inline-flex h-9 w-9 items-center justify-center border border-ink-300 text-ink-600 transition-colors hover:border-brand-600 hover:text-brand-600 disabled:opacity-40 disabled:pointer-events-none dark:border-ink-700 dark:text-ink-300"
       >
         <ChevronRight size={16} />

@@ -2,10 +2,14 @@ import { Container } from "../../components/ui/Container";
 import { SectionHeading } from "../../components/ui/SectionHeading";
 import { Card } from "../../components/ui/Card";
 import { CountUp } from "../../components/ui/CountUp";
-import { about, missionValues, stats } from "../../data/siteContent";
+import { siteContent } from "../../data/siteContent";
+import { useTranslation } from "../../lib/translations";
 import logo from "../../assets/images/logo.png";
 
 export function About() {
+  const { t, language } = useTranslation();
+  const content = siteContent[language];
+
   return (
     <>
       <section className="border-b border-ink-200 bg-ink-50 py-20 dark:border-ink-800 dark:bg-ink-900/40">
@@ -14,9 +18,9 @@ export function About() {
             <img src={logo} alt="A* SQUAD" className="h-24 w-24" />
           </div>
           <div>
-            <p className="kicker justify-center lg:justify-start">{about.eyebrow}</p>
+            <p className="kicker justify-center lg:justify-start">{content.about.eyebrow}</p>
             <h1 className="mt-2 font-serif text-4xl font-semibold text-ink-900 dark:text-white sm:text-5xl">
-              {about.title}
+              {content.about.title}
             </h1>
           </div>
         </Container>
@@ -24,7 +28,7 @@ export function About() {
 
       <section className="py-20">
         <Container className="max-w-3xl space-y-6">
-          {about.paragraphs.map((p) => (
+          {content.about.paragraphs.map((p) => (
             <p key={p} className="text-lg leading-relaxed text-ink-600 dark:text-ink-300">
               {p}
             </p>
@@ -34,7 +38,7 @@ export function About() {
 
       <section className="bg-ink-50 py-20 dark:bg-ink-900/40">
         <Container className="grid grid-cols-2 gap-8 lg:grid-cols-4">
-          {stats.map((stat) => (
+          {content.stats.map((stat) => (
             <div key={stat.label} className="text-center">
               <CountUp
                 value={stat.value}
@@ -48,9 +52,9 @@ export function About() {
 
       <section className="py-20">
         <Container>
-          <SectionHeading eyebrow="Định hướng" title="Mục tiêu & Giá trị cốt lõi" align="center" />
+          <SectionHeading eyebrow={t.about.eyebrow} title={t.about.title} align="center" />
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {missionValues.map((value, i) => (
+            {content.missionValues.map((value, i) => (
               <Card key={value.title} className="p-6">
                 <span className="font-serif text-3xl font-bold text-brand-200 dark:text-brand-900">
                   {String(i + 1).padStart(2, "0")}

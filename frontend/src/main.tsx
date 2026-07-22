@@ -17,6 +17,7 @@ import "@fontsource/dancing-script/700.css";
 import "./index.css";
 import App from "./App.tsx";
 import { ThemeProvider } from "./context/ThemeContext";
+import { LanguageProvider } from "./context/LanguageContext";
 import { AuthProvider } from "./context/AuthContext";
 
 // One-time cleanup: the JWT used to live in localStorage before auth moved to an
@@ -28,9 +29,11 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <ThemeProvider>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <App />
+          </AuthProvider>
+        </LanguageProvider>
       </ThemeProvider>
     </BrowserRouter>
   </StrictMode>,

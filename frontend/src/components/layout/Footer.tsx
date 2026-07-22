@@ -1,11 +1,15 @@
 import { NavLink } from "react-router-dom";
 import { Mail, MapPin } from "lucide-react";
 import { Container } from "../ui/Container";
-import { NAV_LINKS, ORG_NAME, ORG_TAGLINE } from "../../lib/constants";
+import { NAV_LINKS, ORG_NAME } from "../../lib/constants";
+import { useTranslation } from "../../lib/translations";
+import { siteContent } from "../../data/siteContent";
 import logo from "../../assets/images/logo.png";
 
 export function Footer() {
   const year = new Date().getFullYear();
+  const { t, language } = useTranslation();
+  const content = siteContent[language];
 
   return (
     <footer className="border-t border-ink-200 bg-ink-50 dark:border-ink-800 dark:bg-ink-900/40">
@@ -15,11 +19,11 @@ export function Footer() {
             <img src={logo} alt={ORG_NAME} className="h-8 w-8" />
             <span className="font-serif text-lg font-semibold text-ink-900 dark:text-white">{ORG_NAME}</span>
           </div>
-          <p className="mt-4 font-script text-xl text-brand-600 dark:text-brand-400">{ORG_TAGLINE}</p>
+          <p className="mt-4 font-script text-xl text-brand-600 dark:text-brand-400">{content.tagline}</p>
         </div>
 
         <div>
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-ink-400">Điều hướng</h3>
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-ink-400">{t.footer.navigation}</h3>
           <ul className="mt-4 space-y-2.5">
             {NAV_LINKS.map((link) => (
               <li key={link.to}>
@@ -27,7 +31,7 @@ export function Footer() {
                   to={link.to}
                   className="text-sm text-ink-600 transition-colors hover:text-brand-600 dark:text-ink-300 dark:hover:text-brand-400"
                 >
-                  {link.label}
+                  {t.nav[link.key]}
                 </NavLink>
               </li>
             ))}
@@ -35,21 +39,21 @@ export function Footer() {
         </div>
 
         <div>
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-ink-400">Liên hệ</h3>
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-ink-400">{t.footer.contact}</h3>
           <ul className="mt-4 space-y-2.5 text-sm text-ink-600 dark:text-ink-300">
             <li className="flex items-start gap-2">
               <Mail size={16} className="mt-0.5 shrink-0 text-brand-600" />
-              astarsquad@alandas.site
+              {content.contactInfo.email}
             </li>
             <li className="flex items-start gap-2">
               <MapPin size={16} className="mt-0.5 shrink-0 text-brand-600" />
-              Việt Nam
+              {t.footer.address}
             </li>
           </ul>
         </div>
 
         <div>
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-ink-400">Kết nối</h3>
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-ink-400">{t.footer.connect}</h3>
           <div className="mt-4 flex gap-3">
             <a
               href=""
@@ -67,13 +71,13 @@ export function Footer() {
       <div className="border-t border-ink-200 py-6 dark:border-ink-800">
         <Container className="flex flex-col items-center justify-between gap-2 text-xs text-ink-400 sm:flex-row">
           <p>
-            © {year} {ORG_NAME}. All rights reserved.
+            © {year} {ORG_NAME}. {t.footer.rights}
           </p>
           <NavLink
             to="/admin/login"
             className="text-ink-500 transition-colors hover:text-brand-600 dark:text-ink-500 dark:hover:text-brand-400"
           >
-            Đăng nhập
+            {t.footer.login}
           </NavLink>
         </Container>
       </div>
