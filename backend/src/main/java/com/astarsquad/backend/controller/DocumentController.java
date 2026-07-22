@@ -6,16 +6,13 @@ import com.astarsquad.backend.entity.DocumentCategory;
 import com.astarsquad.backend.exception.FileStorageException;
 import com.astarsquad.backend.service.DocumentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
@@ -25,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 public class DocumentController {
 
     private final DocumentService documentService;
+    private final RestClient restClient = RestClient.create();
 
     @GetMapping
     public PageResponse<DocumentResponse> findAll(
@@ -47,21 +45,27 @@ public class DocumentController {
      * filename) only works for image/video resources, not "raw" — so a plain redirect can
      * only ever produce Cloudinary's internal UUID-based filename. Proxying lets us set our
      * own Content-Disposition with the real original filename.
+     *
+     * Fetches the bytes via RestClient rather than UrlResource: UrlResource wraps a plain
+     * java.net.HttpURLConnection whose failures only surface lazily when Spring's response
+     * writer calls getInputStream() — by then headers/status may already be committed, and
+     * the error becomes an opaque unhandled exception. RestClient's retrieve() fails
+     * immediately and deterministically on a non-2xx response, before we've touched the
+     * response at all, so we can turn it into a clear error every time.
      */
     @GetMapping("/{id}/download")
-    public ResponseEntity<Resource> download(@PathVariable Long id) throws MalformedURLException {
+    public ResponseEntity<byte[]> download(@PathVariable Long id) {
         var payload = documentService.prepareDownload(id);
-        Resource resource = new UrlResource(URI.create(payload.url()));
 
-        long contentLength;
+        byte[] content;
         try {
-            // Forces the actual fetch from Cloudinary to happen here instead of later,
-            // deep inside Spring's response-writing machinery where it's much harder to
-            // turn into a clear error. The most common cause of a failure at this point
-            // is Cloudinary's "Restricted media types" setting blocking PDF/ZIP delivery
-            // for "raw" resources — an account setting, not something code can fix.
-            contentLength = resource.contentLength();
-        } catch (IOException ex) {
+            content = restClient.get()
+                    .uri(payload.url())
+                    .retrieve()
+                    .body(byte[].class);
+        } catch (RestClientException ex) {
+            // Most commonly: Cloudinary's "Restricted media types" setting blocking
+            // PDF/ZIP delivery for "raw" resources — an account setting, not a code bug.
             throw new FileStorageException(
                     "Không thể tải tệp tài liệu này từ máy chủ lưu trữ. Vui lòng liên hệ quản trị viên.", ex);
         }
@@ -69,9 +73,8 @@ public class DocumentController {
         String encodedName = URLEncoder.encode(payload.fileName(), StandardCharsets.UTF_8).replace("+", "%20");
 
         return ResponseEntity.ok()
-                .contentLength(contentLength)
                 .contentType(MediaType.parseMediaType(payload.contentType()))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedName)
-                .body(resource);
+                .body(content);
     }
 }
