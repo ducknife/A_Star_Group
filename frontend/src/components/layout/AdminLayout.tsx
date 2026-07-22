@@ -1,5 +1,16 @@
+import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
-import { LayoutDashboard, Users, FileText, ShieldCheck, UserCog, LogOut, ExternalLink } from "lucide-react";
+import {
+  LayoutDashboard,
+  Users,
+  FileText,
+  ShieldCheck,
+  UserCog,
+  LogOut,
+  ExternalLink,
+  Menu,
+  X,
+} from "lucide-react";
 import clsx from "clsx";
 import { useAuth } from "../../context/AuthContext";
 import { ThemeToggle } from "./ThemeToggle";
@@ -18,6 +29,7 @@ const ADMIN_LINKS: Array<{ to: string; label: string; icon: typeof LayoutDashboa
 export function AdminLayout() {
   const { auth, logout } = useAuth();
   const links = ADMIN_LINKS.filter((link) => auth && link.roles.includes(auth.role));
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
     <div className="flex min-h-screen bg-ink-50 text-ink-800 dark:bg-ink-950 dark:text-ink-100">
@@ -73,17 +85,75 @@ export function AdminLayout() {
       </aside>
 
       <div className="flex flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-ink-200 bg-white px-6 py-4 dark:border-ink-800 dark:bg-ink-900">
-          <p className="text-sm text-ink-500 dark:text-ink-400">
-            Xin chào,{" "}
-            <span className="font-medium text-ink-800 dark:text-ink-100">
-              {auth?.username}
-            </span>{" "}
-            <span className="kicker ml-1 align-middle text-[0.65rem]">
-              {auth ? ACCOUNT_ROLE_LABELS[auth.role] : ""}
-            </span>
-          </p>
-          <ThemeToggle />
+        <header className="border-b border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900">
+          <div className="flex items-center justify-between px-6 py-4">
+            <p className="text-sm text-ink-500 dark:text-ink-400">
+              Xin chào,{" "}
+              <span className="font-medium text-ink-800 dark:text-ink-100">
+                {auth?.username}
+              </span>{" "}
+              <span className="kicker ml-1 align-middle text-[0.65rem]">
+                {auth ? ACCOUNT_ROLE_LABELS[auth.role] : ""}
+              </span>
+            </p>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <button
+                type="button"
+                aria-label="Mở menu"
+                onClick={() => setMobileNavOpen((v) => !v)}
+                className="inline-flex h-9 w-9 items-center justify-center border border-ink-300 text-ink-700 dark:border-ink-700 dark:text-ink-200 lg:hidden"
+              >
+                {mobileNavOpen ? <X size={18} /> : <Menu size={18} />}
+              </button>
+            </div>
+          </div>
+
+          {mobileNavOpen && (
+            <nav className="border-t border-ink-200 px-3 py-3 dark:border-ink-800 lg:hidden">
+              <div className="flex flex-col gap-1">
+                {links.map(({ to, label, icon: Icon }) => (
+                  <NavLink
+                    key={to}
+                    to={to}
+                    end={to === "/admin"}
+                    onClick={() => setMobileNavOpen(false)}
+                    className={({ isActive }) =>
+                      clsx(
+                        "flex items-center gap-3 border-l-2 px-3 py-2.5 text-sm font-medium transition-colors",
+                        isActive
+                          ? "border-brand-600 bg-brand-50 text-brand-700 dark:bg-brand-950/40 dark:text-brand-300"
+                          : "border-transparent text-ink-600 hover:bg-ink-100 dark:text-ink-300 dark:hover:bg-ink-800",
+                      )
+                    }
+                  >
+                    <Icon size={17} />
+                    {label}
+                  </NavLink>
+                ))}
+                <a
+                  href="/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-3 border-l-2 border-transparent px-3 py-2.5 text-sm text-ink-500 hover:bg-ink-100 dark:text-ink-400 dark:hover:bg-ink-800"
+                >
+                  <ExternalLink size={17} />
+                  Xem trang chủ
+                </a>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileNavOpen(false);
+                    logout();
+                  }}
+                  className="flex items-center gap-3 border-l-2 border-transparent px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30"
+                >
+                  <LogOut size={17} />
+                  Đăng xuất
+                </button>
+              </div>
+            </nav>
+          )}
         </header>
         <main className="flex-1 p-6 lg:p-8">
           <Outlet />
