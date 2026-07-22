@@ -5,6 +5,7 @@ import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
 import { Modal } from "../../components/ui/Modal";
 import { TextField, SelectField } from "../../components/ui/Field";
+import { CustomSelect } from "../../components/ui/CustomSelect";
 import { Badge } from "../../components/ui/Badge";
 import { LoadingState, ErrorState, EmptyState } from "../../components/ui/StateMessage";
 import { useFetch } from "../../hooks/useFetch";
@@ -116,16 +117,18 @@ export function AccountsAdmin() {
                     {isSelf ? (
                       <Badge>{ACCOUNT_ROLE_LABELS[account.role]}</Badge>
                     ) : (
-                      <select
+                      <CustomSelect
+                        size="sm"
+                        className="w-40"
                         value={account.role}
                         disabled={roleUpdatingId === account.id}
-                        onChange={(e) => handleRoleChange(account.id, e.target.value as AccountRole)}
-                        className="border border-ink-300 bg-white px-2 py-1 text-xs font-medium outline-none focus:border-brand-600 dark:border-ink-700 dark:bg-ink-950 dark:text-ink-100"
-                      >
-                        <option value="MEMBER">Thành viên</option>
-                        <option value="MOD">Điều hành viên</option>
-                        <option value="ADMIN">Quản trị viên</option>
-                      </select>
+                        onChange={(value) => handleRoleChange(account.id, value as AccountRole)}
+                        options={[
+                          { value: "MEMBER", label: "Thành viên" },
+                          { value: "MOD", label: "Điều hành viên" },
+                          { value: "ADMIN", label: "Quản trị viên" },
+                        ]}
+                      />
                     )}
                   </div>
                   {!isSelf && (
@@ -175,11 +178,16 @@ export function AccountsAdmin() {
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
             />
-            <SelectField label="Vai trò" value={role} onChange={(e) => setRole(e.target.value as AccountRole)}>
-              <option value="MEMBER">Thành viên — chỉ đăng tải tài liệu của mình</option>
-              <option value="MOD">Điều hành viên — quản lý thành viên & tài liệu</option>
-              <option value="ADMIN">Quản trị viên — toàn quyền</option>
-            </SelectField>
+            <SelectField
+              label="Vai trò"
+              value={role}
+              onChange={(value) => setRole(value as AccountRole)}
+              options={[
+                { value: "MEMBER", label: "Thành viên — chỉ đăng tải tài liệu của mình" },
+                { value: "MOD", label: "Điều hành viên — quản lý thành viên & tài liệu" },
+                { value: "ADMIN", label: "Quản trị viên — toàn quyền" },
+              ]}
+            />
 
             {formError && <p className="text-sm text-red-600 dark:text-red-400">{formError}</p>}
 

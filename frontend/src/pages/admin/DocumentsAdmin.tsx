@@ -154,14 +154,9 @@ export function DocumentsAdmin() {
             <SelectField
               label="Danh mục"
               value={category}
-              onChange={(e) => setCategory(e.target.value as DocumentCategory)}
-            >
-              {Object.entries(DOCUMENT_CATEGORY_LABELS).map(([key, label]) => (
-                <option key={key} value={key}>
-                  {label}
-                </option>
-              ))}
-            </SelectField>
+              onChange={(value) => setCategory(value as DocumentCategory)}
+              options={Object.entries(DOCUMENT_CATEGORY_LABELS).map(([key, label]) => ({ value: key, label }))}
+            />
             <ImageInput
               label="Ảnh thumbnail"
               required={!editing}

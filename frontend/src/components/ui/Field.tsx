@@ -1,4 +1,5 @@
-import type { InputHTMLAttributes, TextareaHTMLAttributes, SelectHTMLAttributes, ReactNode } from "react";
+import type { InputHTMLAttributes, TextareaHTMLAttributes, ReactNode } from "react";
+import { CustomSelect, type SelectOption } from "./CustomSelect";
 
 const inputClasses =
   "w-full rounded-none border border-ink-300 bg-white px-4 py-2.5 text-sm outline-none focus:border-brand-600 dark:border-ink-700 dark:bg-ink-950 dark:text-ink-100";
@@ -41,14 +42,16 @@ export function TextAreaField({
 
 export function SelectField({
   label,
-  children,
-  ...props
-}: { label: string } & SelectHTMLAttributes<HTMLSelectElement>) {
-  return (
-    <FieldWrapper label={label}>
-      <select className={inputClasses} {...props}>
-        {children}
-      </select>
-    </FieldWrapper>
-  );
+  options,
+  value,
+  onChange,
+  disabled,
+}: {
+  label: string;
+  options: SelectOption[];
+  value: string;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+}) {
+  return <CustomSelect label={label} options={options} value={value} onChange={onChange} disabled={disabled} />;
 }
