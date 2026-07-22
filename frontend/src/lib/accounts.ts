@@ -26,6 +26,7 @@ export const getMyAccount = async (): Promise<Account> => {
 };
 
 export const updateMyAccount = async (payload: {
+  username?: string;
   displayName?: string;
   currentPassword?: string;
   newPassword?: string;

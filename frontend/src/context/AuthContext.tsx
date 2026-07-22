@@ -7,6 +7,7 @@ interface AuthContextValue {
   checkingSession: boolean;
   login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  updateAuth: (account: Account) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -37,7 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ auth, checkingSession, login, logout }}>
+    <AuthContext.Provider value={{ auth, checkingSession, login, logout, updateAuth: setAuth }}>
       {children}
     </AuthContext.Provider>
   );

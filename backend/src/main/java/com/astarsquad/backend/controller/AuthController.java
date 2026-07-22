@@ -3,14 +3,13 @@ package com.astarsquad.backend.controller;
 import com.astarsquad.backend.dto.AccountResponse;
 import com.astarsquad.backend.dto.LoginRequest;
 import com.astarsquad.backend.dto.LoginResponse;
-import com.astarsquad.backend.security.JwtService;
+import com.astarsquad.backend.security.AuthCookieService;
 import com.astarsquad.backend.service.AccountService;
 import com.astarsquad.backend.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,18 +33,19 @@ public class AuthController {
 
     private final AuthService authService;
     private final AccountService accountService;
+    private final AuthCookieService authCookieService;
 
     @PostMapping("/login")
     public AccountResponse login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
         LoginResponse result = authService.login(request);
         Duration maxAge = Duration.between(Instant.now(), result.expiresAt());
-        response.addHeader(HttpHeaders.SET_COOKIE, authCookie(result.token(), maxAge).toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, authCookieService.build(result.token(), maxAge).toString());
         return accountService.findByUsername(result.username());
     }
 
     @PostMapping("/logout")
     public void logout(HttpServletResponse response) {
-        response.addHeader(HttpHeaders.SET_COOKIE, authCookie("", Duration.ZERO).toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, authCookieService.build("", Duration.ZERO).toString());
     }
 
     @GetMapping("/me")
@@ -54,15 +54,5 @@ public class AuthController {
             throw new BadCredentialsException("Chưa đăng nhập.");
         }
         return accountService.findByUsername(authentication.getName());
-    }
-
-    private ResponseCookie authCookie(String token, Duration maxAge) {
-        return ResponseCookie.from(JwtService.AUTH_COOKIE_NAME, token)
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("None")
-                .path("/")
-                .maxAge(maxAge)
-                .build();
     }
 }

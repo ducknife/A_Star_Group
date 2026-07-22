@@ -54,11 +54,23 @@ public class AccountService {
      * A user may only ever update their own account this way — there is no endpoint
      * that lets an admin (or anyone else) edit someone else's account details.
      * Changing the password requires the current password to be supplied correctly.
+     * usernameChanged tells the caller (AccountSelfController) whether it needs to
+     * re-issue the auth cookie, since the JWT subject would otherwise still point at
+     * the now-renamed username.
      */
     @Transactional
-    public AccountResponse updateSelf(String username, AccountSelfUpdateRequest request) {
+    public SelfUpdateResult updateSelf(String username, AccountSelfUpdateRequest request) {
         Account account = accountRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tài khoản: " + username));
+
+        boolean usernameChanged = false;
+        if (request.username() != null && !request.username().equals(account.getUsername())) {
+            if (accountRepository.existsByUsername(request.username())) {
+                throw new DataIntegrityViolationException("Tên đăng nhập đã tồn tại: " + request.username());
+            }
+            account.setUsername(request.username());
+            usernameChanged = true;
+        }
 
         if (request.displayName() != null) {
             account.setDisplayName(request.displayName());
@@ -72,7 +84,10 @@ public class AccountService {
             account.setPasswordHash(passwordEncoder.encode(request.newPassword()));
         }
 
-        return AccountResponse.from(account);
+        return new SelfUpdateResult(AccountResponse.from(account), usernameChanged);
+    }
+
+    public record SelfUpdateResult(AccountResponse account, boolean usernameChanged) {
     }
 
     @Transactional

@@ -19,6 +19,11 @@ import App from "./App.tsx";
 import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider } from "./context/AuthContext";
 
+// One-time cleanup: the JWT used to live in localStorage before auth moved to an
+// HttpOnly cookie. Browsers never delete this on their own, so remove any leftover
+// value from before that migration.
+localStorage.removeItem("astarsquad-auth");
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>

@@ -7,11 +7,14 @@ import { TextField } from "../../components/ui/Field";
 import { Badge } from "../../components/ui/Badge";
 import { LoadingState, ErrorState } from "../../components/ui/StateMessage";
 import { useFetch } from "../../hooks/useFetch";
+import { useAuth } from "../../context/AuthContext";
 import { getMyAccount, updateMyAccount } from "../../lib/accounts";
 import { ACCOUNT_ROLE_LABELS } from "../../lib/constants";
 
 export function MyAccount() {
+  const { updateAuth } = useAuth();
   const { data, loading, error } = useFetch(() => getMyAccount(), []);
+  const [username, setUsername] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -20,6 +23,7 @@ export function MyAccount() {
   const [formError, setFormError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  const effectiveUsername = username ?? data?.username ?? "";
   const effectiveDisplayName = displayName ?? data?.displayName ?? "";
 
   const handleSubmit = async (e: FormEvent) => {
@@ -34,11 +38,14 @@ export function MyAccount() {
 
     setSaving(true);
     try {
-      await updateMyAccount({
+      const updated = await updateMyAccount({
+        username: effectiveUsername,
         displayName: effectiveDisplayName,
         currentPassword: currentPassword || undefined,
         newPassword: newPassword || undefined,
       });
+      updateAuth(updated);
+      setUsername(updated.username);
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
@@ -71,16 +78,20 @@ export function MyAccount() {
         {data && (
           <Card className="p-6">
             <div className="flex items-center justify-between border-b border-ink-200 pb-4 dark:border-ink-800">
-              <div>
-                <p className="font-medium text-ink-900 dark:text-white">@{data.username}</p>
-                <p className="text-sm text-ink-500 dark:text-ink-400">
-                  Tham gia {new Date(data.createdAt).toLocaleDateString("vi-VN")}
-                </p>
-              </div>
+              <p className="text-sm text-ink-500 dark:text-ink-400">
+                Tham gia {new Date(data.createdAt).toLocaleDateString("vi-VN")}
+              </p>
               <Badge>{ACCOUNT_ROLE_LABELS[data.role]}</Badge>
             </div>
 
             <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+              <TextField
+                label="Tên đăng nhập"
+                required
+                minLength={3}
+                value={effectiveUsername}
+                onChange={(e) => setUsername(e.target.value)}
+              />
               <TextField
                 label="Tên hiển thị"
                 value={effectiveDisplayName}
