@@ -45,6 +45,15 @@ public class Member {
     @Column(name = "photo_url", length = 500)
     private String photoUrl;
 
+    @Column(name = "linkedin_url", length = 300)
+    private String linkedinUrl;
+
+    @Column(name = "github_url", length = 300)
+    private String githubUrl;
+
+    @Column(name = "other_url", length = 300)
+    private String otherUrl;
+
     @Column(nullable = false)
     @Builder.Default
     private boolean featured = false;

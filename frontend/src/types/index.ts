@@ -7,6 +7,9 @@ export interface Member {
   graduationYear?: number;
   bio?: string;
   photoUrl?: string;
+  linkedinUrl?: string;
+  githubUrl?: string;
+  otherUrl?: string;
   featured: boolean;
   sortOrder: number;
 }

@@ -6,6 +6,7 @@ import { ThemeToggle } from "./ThemeToggle";
 import { ACCOUNT_ROLE_LABELS, ORG_NAME } from "../../lib/constants";
 import type { AccountRole } from "../../types";
 import logo from "../../assets/images/logo.png";
+import { ScrollToTopButton } from "../ui/ScrollToTopButton";
 
 const ADMIN_LINKS: Array<{ to: string; label: string; icon: typeof LayoutDashboard; roles: AccountRole[] }> = [
   { to: "/admin", label: "Tổng quan", icon: LayoutDashboard, roles: ["ADMIN", "MOD", "MEMBER"] },
@@ -88,6 +89,7 @@ export function AdminLayout() {
           <Outlet />
         </main>
       </div>
+      <ScrollToTopButton />
     </div>
   );
 }

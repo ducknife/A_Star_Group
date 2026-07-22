@@ -15,15 +15,12 @@ import { listDocuments } from "../../lib/documents";
 import { hero, stats, about, missionValues } from "../../data/siteContent";
 import { ORG_TAGLINE, MARQUEE_ITEMS } from "../../lib/constants";
 import logo from "../../assets/images/logo.png";
-import iconNotebook from "../../assets/images/3d/notebook.png";
 import iconPencil from "../../assets/images/3d/pencil.png";
-import iconBulb from "../../assets/images/3d/bulb.png";
 import iconRocket from "../../assets/images/3d/rocket.png";
-import iconSphere from "../../assets/images/3d/sphere.png";
 
 export function Home() {
   const members = useFetch(() => listMembers(true), []);
-  const documents = useFetch(() => listDocuments({ size: 4 }), []);
+  const documents = useFetch(() => listDocuments({ size: 3 }), []);
 
   return (
     <>
@@ -58,28 +55,10 @@ export function Home() {
                 <img src={logo} alt="A* SQUAD" className="w-40 sm:w-48" />
               </div>
               <img
-                src={iconNotebook}
-                alt=""
-                aria-hidden
-                className="absolute -left-4 -top-4 w-28 -rotate-12 drop-shadow-xl sm:-left-6 sm:-top-6 sm:w-32"
-              />
-              <img
-                src={iconBulb}
-                alt=""
-                aria-hidden
-                className="absolute -right-4 -top-6 w-24 rotate-12 drop-shadow-xl sm:-right-6 sm:w-28"
-              />
-              <img
                 src={iconPencil}
                 alt=""
                 aria-hidden
                 className="absolute -bottom-6 -right-4 w-28 rotate-6 drop-shadow-xl sm:-bottom-8 sm:-right-6 sm:w-32"
-              />
-              <img
-                src={iconSphere}
-                alt=""
-                aria-hidden
-                className="absolute -bottom-4 -left-6 w-24 -rotate-6 drop-shadow-xl sm:-bottom-6 sm:-left-8 sm:w-28"
               />
             </div>
             <p className="mt-8 font-script text-2xl text-brand-600 dark:text-brand-400">{ORG_TAGLINE}</p>
@@ -172,8 +151,8 @@ export function Home() {
               <EmptyState message="Chưa có thành viên nổi bật nào được thêm." />
             )}
             {members.data && members.data.length > 0 && (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                {members.data.slice(0, 4).map((member) => (
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {members.data.slice(0, 3).map((member) => (
                   <MemberCard key={member.id} member={member} />
                 ))}
               </div>
@@ -202,7 +181,7 @@ export function Home() {
               <EmptyState message="Chưa có tài liệu nào được đăng tải." />
             )}
             {documents.data && documents.data.content.length > 0 && (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {documents.data.content.map((doc) => (
                   <DocumentCard key={doc.id} document={doc} />
                 ))}

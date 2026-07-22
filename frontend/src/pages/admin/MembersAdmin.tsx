@@ -20,6 +20,9 @@ const emptyForm: FormState = {
   graduationYear: undefined,
   bio: "",
   photoUrl: "",
+  linkedinUrl: "",
+  githubUrl: "",
+  otherUrl: "",
   featured: false,
   sortOrder: 0,
 };
@@ -169,6 +172,29 @@ export function MembersAdmin() {
               label="Giới thiệu ngắn"
               value={form.bio ?? ""}
               onChange={(e) => setForm({ ...form, bio: e.target.value })}
+            />
+            <div className="grid grid-cols-2 gap-4">
+              <TextField
+                label="LinkedIn (không bắt buộc)"
+                type="url"
+                placeholder="https://linkedin.com/in/..."
+                value={form.linkedinUrl ?? ""}
+                onChange={(e) => setForm({ ...form, linkedinUrl: e.target.value })}
+              />
+              <TextField
+                label="GitHub (không bắt buộc)"
+                type="url"
+                placeholder="https://github.com/..."
+                value={form.githubUrl ?? ""}
+                onChange={(e) => setForm({ ...form, githubUrl: e.target.value })}
+              />
+            </div>
+            <TextField
+              label="Liên kết khác (không bắt buộc)"
+              type="url"
+              placeholder="https://..."
+              value={form.otherUrl ?? ""}
+              onChange={(e) => setForm({ ...form, otherUrl: e.target.value })}
             />
             <label className="flex items-center gap-2 text-sm text-ink-700 dark:text-ink-300">
               <input

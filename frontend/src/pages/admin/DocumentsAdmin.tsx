@@ -99,12 +99,12 @@ export function DocumentsAdmin() {
         {error && <ErrorState message={error} />}
         {data && documents.length === 0 && <EmptyState message="Chưa có tài liệu nào. Hãy tải lên tài liệu đầu tiên." />}
         {documents.length > 0 && (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {documents.map((doc) => {
               const canManage = canManageAll || doc.uploadedBy === auth?.username;
               return (
                 <Card key={doc.id} className="flex flex-col">
-                  <div className="aspect-[3/4] w-full overflow-hidden border-b border-ink-200 bg-ink-100 dark:border-ink-800 dark:bg-ink-800">
+                  <div className="aspect-[4/3] w-full overflow-hidden border-b border-ink-200 bg-ink-100 dark:border-ink-800 dark:bg-ink-800">
                     <img src={doc.thumbnailUrl} alt={doc.title} className="h-full w-full object-cover" />
                   </div>
                   <div className="flex flex-1 flex-col p-4">

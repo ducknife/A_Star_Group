@@ -11,6 +11,9 @@ public record MemberResponse(
         Integer graduationYear,
         String bio,
         String photoUrl,
+        String linkedinUrl,
+        String githubUrl,
+        String otherUrl,
         boolean featured,
         int sortOrder
 ) {
@@ -24,6 +27,9 @@ public record MemberResponse(
                 m.getGraduationYear(),
                 m.getBio(),
                 m.getPhotoUrl(),
+                m.getLinkedinUrl(),
+                m.getGithubUrl(),
+                m.getOtherUrl(),
                 m.isFeatured(),
                 m.getSortOrder()
         );

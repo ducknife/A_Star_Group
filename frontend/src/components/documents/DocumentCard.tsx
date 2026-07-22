@@ -9,7 +9,7 @@ import type { AppDocument } from "../../types";
 export function DocumentCard({ document }: { document: AppDocument }) {
   return (
     <Card className="flex h-full flex-col">
-      <div className="aspect-[3/4] w-full overflow-hidden border-b border-ink-200 bg-ink-100 dark:border-ink-800 dark:bg-ink-800">
+      <div className="aspect-[4/3] w-full overflow-hidden border-b border-ink-200 bg-ink-100 dark:border-ink-800 dark:bg-ink-800">
         <img src={document.thumbnailUrl} alt={document.title} className="h-full w-full object-cover" />
       </div>
 

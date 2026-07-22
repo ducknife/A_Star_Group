@@ -1,0 +1,3 @@
+ALTER TABLE members ADD COLUMN linkedin_url VARCHAR(300);
+ALTER TABLE members ADD COLUMN github_url VARCHAR(300);
+ALTER TABLE members ADD COLUMN other_url VARCHAR(300);

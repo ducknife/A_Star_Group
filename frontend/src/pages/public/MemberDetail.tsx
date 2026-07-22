@@ -1,9 +1,54 @@
+import type { ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, GraduationCap } from "lucide-react";
+import { ArrowLeft, GraduationCap, Link2 } from "lucide-react";
 import { Container } from "../../components/ui/Container";
 import { LoadingState, ErrorState } from "../../components/ui/StateMessage";
 import { useFetch } from "../../hooks/useFetch";
 import { getMember } from "../../lib/members";
+import type { Member } from "../../types";
+
+function LinkedinIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.6 0 4.27 2.37 4.27 5.46zM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13M7.11 20.45H3.56V9h3.55z" />
+    </svg>
+  );
+}
+
+function GithubIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.15-1.11-1.46-1.11-1.46-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.6 9.6 0 0 1 5 0c1.9-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.75c0 .26.18.58.69.48A10 10 0 0 0 12 2" />
+    </svg>
+  );
+}
+
+function SocialLinks({ member }: { member: Member }) {
+  const links = [
+    member.linkedinUrl && { href: member.linkedinUrl, label: "LinkedIn", icon: <LinkedinIcon /> },
+    member.githubUrl && { href: member.githubUrl, label: "GitHub", icon: <GithubIcon /> },
+    member.otherUrl && { href: member.otherUrl, label: "Liên kết", icon: <Link2 size={16} /> },
+  ].filter(Boolean) as Array<{ href: string; label: string; icon: ReactNode }>;
+
+  if (links.length === 0) return null;
+
+  return (
+    <div className="mt-6 flex gap-2 border-t border-ink-200 pt-6 dark:border-ink-800">
+      {links.map((link) => (
+        <a
+          key={link.label}
+          href={link.href}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={link.label}
+          className="inline-flex h-9 w-9 items-center justify-center border border-ink-300 text-ink-600 transition-colors hover:border-brand-600 hover:text-brand-600 dark:border-ink-700 dark:text-ink-300"
+        >
+          {link.icon}
+        </a>
+      ))}
+    </div>
+  );
+}
 
 export function MemberDetail() {
   const { id } = useParams<{ id: string }>();
@@ -49,6 +94,8 @@ export function MemberDetail() {
             {member.bio && (
               <p className="mt-6 text-base leading-relaxed text-ink-600 dark:text-ink-300">{member.bio}</p>
             )}
+
+            <SocialLinks member={member} />
           </div>
         </div>
       </Container>

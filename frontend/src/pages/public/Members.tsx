@@ -51,7 +51,7 @@ export function Members() {
             <EmptyState message={query ? "Không tìm thấy thành viên phù hợp." : "Chưa có thành viên nào được thêm."} />
           )}
           {filtered.length > 0 && (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {filtered.map((member) => (
                 <MemberCard key={member.id} member={member} />
               ))}

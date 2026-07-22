@@ -65,13 +65,16 @@ export function Footer() {
       </Container>
 
       <div className="border-t border-ink-200 py-6 dark:border-ink-800">
-        <Container className="text-center text-xs text-ink-400">
+        <Container className="flex flex-col items-center justify-between gap-2 text-xs text-ink-400 sm:flex-row">
           <p>
-            © {year} {ORG_NAME}. All rights reserved.{" "}
-            <NavLink to="/admin/login" aria-label="Đăng nhập" className="text-ink-300 dark:text-ink-700">
-              ·
-            </NavLink>
+            © {year} {ORG_NAME}. All rights reserved.
           </p>
+          <NavLink
+            to="/admin/login"
+            className="text-ink-500 transition-colors hover:text-brand-600 dark:text-ink-500 dark:hover:text-brand-400"
+          >
+            Đăng nhập
+          </NavLink>
         </Container>
       </div>
     </footer>
