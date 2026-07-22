@@ -2,6 +2,7 @@ package com.astarsquad.backend.controller;
 
 import com.astarsquad.backend.dto.AccountRequest;
 import com.astarsquad.backend.dto.AccountResponse;
+import com.astarsquad.backend.dto.AccountRoleUpdateRequest;
 import com.astarsquad.backend.service.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,15 @@ public class AccountController {
     @ResponseStatus(HttpStatus.CREATED)
     public AccountResponse create(@Valid @RequestBody AccountRequest request) {
         return accountService.create(request);
+    }
+
+    @PutMapping("/{id}/role")
+    public AccountResponse updateRole(
+            @PathVariable Long id,
+            @Valid @RequestBody AccountRoleUpdateRequest request,
+            Authentication authentication
+    ) {
+        return accountService.updateRole(id, request, authentication.getName());
     }
 
     @DeleteMapping("/{id}")

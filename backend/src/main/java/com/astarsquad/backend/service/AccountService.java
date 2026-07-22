@@ -2,11 +2,13 @@ package com.astarsquad.backend.service;
 
 import com.astarsquad.backend.dto.AccountRequest;
 import com.astarsquad.backend.dto.AccountResponse;
+import com.astarsquad.backend.dto.AccountRoleUpdateRequest;
 import com.astarsquad.backend.dto.AccountSelfUpdateRequest;
 import com.astarsquad.backend.entity.Account;
 import com.astarsquad.backend.entity.AccountRole;
 import com.astarsquad.backend.exception.ResourceNotFoundException;
 import com.astarsquad.backend.repository.AccountRepository;
+import com.astarsquad.backend.repository.DocumentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.AccessDeniedException;
@@ -22,6 +24,7 @@ import java.util.List;
 public class AccountService {
 
     private final AccountRepository accountRepository;
+    private final DocumentRepository documentRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
@@ -68,7 +71,12 @@ public class AccountService {
             if (accountRepository.existsByUsername(request.username())) {
                 throw new DataIntegrityViolationException("Tên đăng nhập đã tồn tại: " + request.username());
             }
+            String oldUsername = account.getUsername();
             account.setUsername(request.username());
+            // Document.uploadedBy stores a plain username snapshot, not a foreign key —
+            // it must be cascaded here or the user loses edit/delete rights over their
+            // own uploads the moment their username changes.
+            documentRepository.renameUploadedBy(oldUsername, request.username());
             usernameChanged = true;
         }
 
@@ -88,6 +96,31 @@ public class AccountService {
     }
 
     public record SelfUpdateResult(AccountResponse account, boolean usernameChanged) {
+    }
+
+    /**
+     * Admin-only role assignment (e.g. promoting a MEMBER to MOD). Deliberately
+     * separate from updateSelf: it only ever touches the role field, so it still can't
+     * be used to change someone else's username/password/display name — the "no
+     * editing another account's details" rule holds for everything except role.
+     */
+    @Transactional
+    public AccountResponse updateRole(Long id, AccountRoleUpdateRequest request, String currentUsername) {
+        Account account = accountRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tài khoản có id=" + id));
+
+        if (account.getUsername().equals(currentUsername)) {
+            throw new AccessDeniedException("Không thể tự đổi vai trò của tài khoản đang đăng nhập.");
+        }
+
+        if (account.getRole() == AccountRole.ADMIN && request.role() != AccountRole.ADMIN
+                && accountRepository.findAllByOrderByUsernameAsc().stream()
+                        .filter(a -> a.getRole() == AccountRole.ADMIN).count() <= 1) {
+            throw new AccessDeniedException("Không thể hạ quyền tài khoản admin cuối cùng.");
+        }
+
+        account.setRole(request.role());
+        return AccountResponse.from(account);
     }
 
     @Transactional

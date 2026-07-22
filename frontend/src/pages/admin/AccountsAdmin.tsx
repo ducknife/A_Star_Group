@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
@@ -8,7 +9,7 @@ import { Badge } from "../../components/ui/Badge";
 import { LoadingState, ErrorState, EmptyState } from "../../components/ui/StateMessage";
 import { useFetch } from "../../hooks/useFetch";
 import { useAuth } from "../../context/AuthContext";
-import { createAccount, deleteAccount, listAccounts } from "../../lib/accounts";
+import { createAccount, deleteAccount, listAccounts, updateAccountRole } from "../../lib/accounts";
 import { ACCOUNT_ROLE_LABELS } from "../../lib/constants";
 import type { AccountRole } from "../../types";
 
@@ -25,6 +26,8 @@ export function AccountsAdmin() {
   const [role, setRole] = useState<AccountRole>("MEMBER");
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [roleUpdatingId, setRoleUpdatingId] = useState<number | null>(null);
+  const [roleError, setRoleError] = useState<string | null>(null);
 
   const resetForm = () => {
     setUsername("");
@@ -55,6 +58,23 @@ export function AccountsAdmin() {
     refetch();
   };
 
+  const handleRoleChange = async (id: number, role: AccountRole) => {
+    setRoleError(null);
+    setRoleUpdatingId(id);
+    try {
+      await updateAccountRole(id, role);
+      refetch();
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.data?.message) {
+        setRoleError(err.response.data.message);
+      } else {
+        setRoleError("Không thể đổi vai trò tài khoản.");
+      }
+    } finally {
+      setRoleUpdatingId(null);
+    }
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between">
@@ -78,34 +98,51 @@ export function AccountsAdmin() {
       <div className="mt-8">
         {loading && <LoadingState />}
         {error && <ErrorState message={error} />}
+        {roleError && <p className="mb-4 text-sm text-red-600 dark:text-red-400">{roleError}</p>}
         {data && data.length === 0 && <EmptyState message="Chưa có tài khoản nào ngoài admin." />}
         {data && data.length > 0 && (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {data.map((account) => (
-              <Card key={account.id} className="p-5">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="font-medium text-ink-900 dark:text-white">
-                      {account.displayName || account.username}
-                    </p>
-                    <p className="text-sm text-ink-500 dark:text-ink-400">@{account.username}</p>
+            {data.map((account) => {
+              const isSelf = account.username === auth?.username;
+              return (
+                <Card key={account.id} className="p-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-medium text-ink-900 dark:text-white">
+                        {account.displayName || account.username}
+                      </p>
+                      <p className="text-sm text-ink-500 dark:text-ink-400">@{account.username}</p>
+                    </div>
+                    {isSelf ? (
+                      <Badge>{ACCOUNT_ROLE_LABELS[account.role]}</Badge>
+                    ) : (
+                      <select
+                        value={account.role}
+                        disabled={roleUpdatingId === account.id}
+                        onChange={(e) => handleRoleChange(account.id, e.target.value as AccountRole)}
+                        className="border border-ink-300 bg-white px-2 py-1 text-xs font-medium outline-none focus:border-brand-600 dark:border-ink-700 dark:bg-ink-950 dark:text-ink-100"
+                      >
+                        <option value="MEMBER">Thành viên</option>
+                        <option value="MOD">Điều hành viên</option>
+                        <option value="ADMIN">Quản trị viên</option>
+                      </select>
+                    )}
                   </div>
-                  <Badge>{ACCOUNT_ROLE_LABELS[account.role]}</Badge>
-                </div>
-                {account.username !== auth?.username && (
-                  <div className="mt-4">
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      icon={<Trash2 size={14} />}
-                      onClick={() => handleDelete(account.id, account.displayName || account.username)}
-                    >
-                      Xoá
-                    </Button>
-                  </div>
-                )}
-              </Card>
-            ))}
+                  {!isSelf && (
+                    <div className="mt-4">
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        icon={<Trash2 size={14} />}
+                        onClick={() => handleDelete(account.id, account.displayName || account.username)}
+                      >
+                        Xoá
+                      </Button>
+                    </div>
+                  )}
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>

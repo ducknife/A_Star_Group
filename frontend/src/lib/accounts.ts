@@ -20,6 +20,11 @@ export const deleteAccount = async (id: number): Promise<void> => {
   await api.delete(`/api/admin/accounts/${id}`);
 };
 
+export const updateAccountRole = async (id: number, role: AccountRole): Promise<Account> => {
+  const { data } = await api.put<Account>(`/api/admin/accounts/${id}/role`, { role });
+  return data;
+};
+
 export const getMyAccount = async (): Promise<Account> => {
   const { data } = await api.get<Account>("/api/account/me");
   return data;
