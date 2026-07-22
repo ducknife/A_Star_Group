@@ -26,8 +26,14 @@ public class Document {
     @Column(nullable = false, length = 200)
     private String title;
 
+    @Column(name = "title_en", length = 200)
+    private String titleEn;
+
     @Column(length = 1000)
     private String description;
+
+    @Column(name = "description_en", length = 1000)
+    private String descriptionEn;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)

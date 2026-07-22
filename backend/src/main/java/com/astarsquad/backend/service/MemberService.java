@@ -43,6 +43,7 @@ public class MemberService {
                 .major(request.major())
                 .graduationYear(request.graduationYear())
                 .bio(request.bio())
+                .bioEn(request.bioEn())
                 .linkedinUrl(request.linkedinUrl())
                 .githubUrl(request.githubUrl())
                 .otherUrl(request.otherUrl())
@@ -61,6 +62,7 @@ public class MemberService {
         member.setMajor(request.major());
         member.setGraduationYear(request.graduationYear());
         member.setBio(request.bio());
+        member.setBioEn(request.bioEn());
         member.setLinkedinUrl(request.linkedinUrl());
         member.setGithubUrl(request.githubUrl());
         member.setOtherUrl(request.otherUrl());

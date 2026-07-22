@@ -21,27 +21,33 @@ public class DocumentAdminController {
     @ResponseStatus(HttpStatus.CREATED)
     public DocumentResponse create(
             @RequestParam String title,
+            @RequestParam(required = false) String titleEn,
             @RequestParam(required = false) String description,
+            @RequestParam(required = false) String descriptionEn,
             @RequestParam DocumentCategory category,
             @RequestParam("file") MultipartFile file,
             @RequestParam("thumbnail") MultipartFile thumbnail,
             Authentication authentication
     ) {
-        return documentService.create(title, description, category, file, thumbnail, authentication.getName());
+        return documentService.create(
+                title, titleEn, description, descriptionEn, category, file, thumbnail, authentication.getName()
+        );
     }
 
     @PutMapping(value = "/{id}", consumes = "multipart/form-data")
     public DocumentResponse update(
             @PathVariable Long id,
             @RequestParam String title,
+            @RequestParam(required = false) String titleEn,
             @RequestParam(required = false) String description,
+            @RequestParam(required = false) String descriptionEn,
             @RequestParam DocumentCategory category,
             @RequestParam(value = "file", required = false) MultipartFile file,
             @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnail,
             Authentication authentication
     ) {
         return documentService.update(
-                id, title, description, category, file, thumbnail,
+                id, title, titleEn, description, descriptionEn, category, file, thumbnail,
                 authentication.getName(), canManageAll(authentication)
         );
     }

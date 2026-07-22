@@ -42,6 +42,9 @@ public class Member {
     @Column(length = 1000)
     private String bio;
 
+    @Column(name = "bio_en", length = 1000)
+    private String bioEn;
+
     @Column(name = "photo_url", length = 500)
     private String photoUrl;
 

@@ -8,7 +8,9 @@ import java.time.Instant;
 public record DocumentResponse(
         Long id,
         String title,
+        String titleEn,
         String description,
+        String descriptionEn,
         DocumentCategory category,
         String fileName,
         String thumbnailUrl,
@@ -22,7 +24,9 @@ public record DocumentResponse(
         return new DocumentResponse(
                 d.getId(),
                 d.getTitle(),
+                d.getTitleEn(),
                 d.getDescription(),
+                d.getDescriptionEn(),
                 d.getCategory(),
                 d.getFileName(),
                 d.getThumbnailUrl(),

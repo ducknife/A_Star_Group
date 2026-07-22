@@ -47,7 +47,9 @@ public class DocumentService {
     @Transactional
     public DocumentResponse create(
             String title,
+            String titleEn,
             String description,
+            String descriptionEn,
             DocumentCategory category,
             MultipartFile file,
             MultipartFile thumbnail,
@@ -58,7 +60,9 @@ public class DocumentService {
 
         Document document = Document.builder()
                 .title(title)
+                .titleEn(titleEn)
                 .description(description)
+                .descriptionEn(descriptionEn)
                 .category(category)
                 .fileName(file.getOriginalFilename())
                 .cloudinaryPublicId(uploadedFile.publicId())
@@ -85,7 +89,9 @@ public class DocumentService {
     public DocumentResponse update(
             Long id,
             String title,
+            String titleEn,
             String description,
+            String descriptionEn,
             DocumentCategory category,
             MultipartFile file,
             MultipartFile thumbnail,
@@ -96,7 +102,9 @@ public class DocumentService {
         requireOwnership(document, currentUsername, canManageAll, "sửa");
 
         document.setTitle(title);
+        document.setTitleEn(titleEn);
         document.setDescription(description);
+        document.setDescriptionEn(descriptionEn);
         document.setCategory(category);
 
         if (file != null && !file.isEmpty()) {

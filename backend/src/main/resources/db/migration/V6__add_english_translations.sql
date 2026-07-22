@@ -1,0 +1,4 @@
+ALTER TABLE members ADD COLUMN bio_en VARCHAR(1000);
+
+ALTER TABLE documents ADD COLUMN title_en VARCHAR(200);
+ALTER TABLE documents ADD COLUMN description_en VARCHAR(1000);
