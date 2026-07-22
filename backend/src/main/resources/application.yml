@@ -24,24 +24,6 @@ spring:
       max-file-size: 25MB
       max-request-size: 25MB
 
-  mail:
-    host: ${MAIL_HOST:smtp.gmail.com}
-    port: ${MAIL_PORT:587}
-    username: ${EMAIL_DEFAULT}
-    password: ${EMAIL_PASSWORD_APP}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-          # Without explicit timeouts, a blocked/unreachable SMTP port hangs the
-          # request indefinitely (relying on OS-level TCP timeouts) instead of
-          # failing fast with a clear error.
-          connectiontimeout: 10000
-          timeout: 10000
-          writetimeout: 10000
-
 server:
   # Render (and most PaaS) inject PORT at runtime; SERVER_PORT/8080 remain the local/Docker default.
   port: ${PORT:${SERVER_PORT:8080}}
@@ -49,12 +31,7 @@ server:
 management:
   endpoint:
     health:
-      # Don't let a (possibly not-yet-configured) SMTP server take down the health
-      # check Render uses to decide if this instance is alive.
       show-details: never
-  health:
-    mail:
-      enabled: false
 
 app:
   jwt:
@@ -68,8 +45,9 @@ app:
     cloud-name: ${CLOUDINARY_CLOUD_NAME}
     api-key: ${CLOUDINARY_API_KEY}
     api-secret: ${CLOUDINARY_API_SECRET}
+  resend:
+    api-key: ${RESEND_API_KEY}
   mail:
-    from: ${EMAIL_DEFAULT}
     contact-recipient: ${EMAIL_DEFAULT}
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}

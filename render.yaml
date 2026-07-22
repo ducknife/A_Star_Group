@@ -54,7 +54,7 @@ services:
         sync: false
       - key: EMAIL_DEFAULT
         sync: false
-      - key: EMAIL_PASSWORD_APP
+      - key: RESEND_API_KEY
         sync: false
 
       # Defaults to localhost so the first deploy still boots; update to your
